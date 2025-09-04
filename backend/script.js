@@ -1,6 +1,11 @@
 const express = require('express');
 require('dotenv').config({ path: './backend/.env' }); // Fix: Remove 'backend/' since you're running from backend directory
 const cors = require('cors');
+const admin = require('firebase-admin');
+const { access } = require('fs');
+
+admin.initializeApp();
+const db = admin.firestore();
 
 const app = express();
 
@@ -62,10 +67,14 @@ app.get('/callback', async (req, res) => {
             return res.status(400).json({ error: tokenData.error });
         }
 
+        const access_token = tokenData.access_token;
+        const refresh_token = tokenData.refresh_token;
+        const expires_in = tokenData.expires_in;
+
         res.json({
-            access_token: tokenData.access_token,
-            refresh_token: tokenData.refresh_token,
-            expires_in: tokenData.expires_in
+            access_token: access_token,
+            refresh_token: refresh_token,
+            expires_in: expires_in
         });
     } catch (error) {
         console.error(error);
