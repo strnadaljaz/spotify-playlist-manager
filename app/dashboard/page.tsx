@@ -7,8 +7,23 @@ export default function Dashboard() {
     const [userInfo, setUserInfo] = useState(null);
     const router = useRouter();
 
+    const spotify_id = localStorage.getItem("spotify_id");
+
+    try {
+        const response = await fetch("http://127.0.0.1:3001/getAccessToken", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ spotify_id })
+        });
+    } catch(error) {
+        console.error(error);
+    }
+
+    const token = response.json();
+
     useEffect(() => {
-        const token = localStorage.getItem('spotify_access_token');
         
         if (!token) {
             router.push('/');

@@ -36,15 +36,16 @@ export default function Callback() {
 
                 const data = await response.json();
 
+                // Save spotify id to local storage
+                localStorage.setItem("spotify_id", data.spotify_id);
+
                 if (data.error) {
                     setStatus('Error: ' + data.error);
                     return;
                 }
-
-                // Store the access token (you might want to use a more secure method)
-                localStorage.setItem('spotify_access_token', data.access_token);
-                localStorage.setItem('spotify_refresh_token', data.refresh_token);
                 
+                
+
                 setStatus('Authentication successful! Redirecting...');
                 
                 // Redirect to dashboard or main app
