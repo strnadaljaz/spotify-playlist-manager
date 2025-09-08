@@ -60,32 +60,32 @@ app.post('/getAccessToken', async (req, res) => {
     try {
         const data = await readData(spotify_id);
         if (!data) {
-            res.status(404).json({ error: 'User not found' });
+            return res.status(404).json({ error: 'User not found' });
+        }
+        
+        const access_token = data.access_token;
+        const refresh_token = data.refresh_token;
+        const expires = new Date(data.expires);
+
+        if (Date.now() + 120000 < expires) {
+            return res.json({ access_token: access_token });
+        }
+        // Get new access_token
+        else {
+            const newData = await getNewTokens(refresh_token, clientID);
+            const new_access_token = newData.access_token;
+            const new_expires_in = newData.expires_in;
+            const now = Date.now();
+            const new_expires = new Date(now + new_expires_in * 1000);
+            const new_refresh_token = newData.refresh_token;
+
+            await writeData(spotify_id, new_access_token, new_refresh_token, new_expires.toString());
+
+            return res.json({ access_token: new_access_token });
         }
     } catch (error) {
         console.error('Database error:', error);
-        res.status(500).json({ error: 'Database error' });
-    }
-
-    const access_token = data.access_token;
-    const refresh_token = data.refresh_token;
-    const expires = new Date(data.expires);
-
-    if (Date.now() + 120000 < expires) {
-        res.json(access_token);
-    }
-    // Get new access_token
-    else {
-        const newData = getNewTokens(refresh_token, clientID);
-        const new_access_token = newData.access_token;
-        const new_expires_in = newData.expires_in;
-        const now = Date.now();
-        const new_expires = new Date(now + new_expires_in * 1000);
-        const new_refresh_token = newData.refresh_token;
-
-        writeData(spotify_id, new_access_token, new_refresh_token, new_expires.toString());
-
-        res.json(new_access_token);
+        return res.status(500).json({ error: 'Database error' });
     }
 });
 

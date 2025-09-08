@@ -7,17 +7,19 @@ export default function Home() {
 
   const handleLoginClick = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:3001/getAuthorizationUrl');
+      const response = await fetch('http://127.0.0.1:3001/getAuthorizationUrl', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const authorizationUrl = await response.json();
-
-      console.log('Authorization URL:', authorizationUrl);
-
-      window.location.href = authorizationUrl;
+      const authUrl = await response.json();
+      window.location.href = authUrl;
     } catch (error) {
       console.error(error);
     }
