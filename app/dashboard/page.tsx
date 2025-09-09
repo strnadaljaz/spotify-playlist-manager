@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { SpotifyPlaylist } from "./defines";
+import { SpotifyPlaylist, SpotifyUserInfo } from "./defines";
 
 export default function Dashboard() {
-    const [userInfo, setUserInfo] = useState(null);
+    const [userInfo, setUserInfo] = useState<SpotifyUserInfo | null>(null);
     const [token, setToken] = useState(null);
     const [playlistsData, setPlaylistsData] = useState<SpotifyPlaylist[]>([]);
     const router = useRouter();

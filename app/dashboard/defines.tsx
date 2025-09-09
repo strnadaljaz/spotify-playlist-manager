@@ -18,3 +18,9 @@ export interface SpotifyPlaylist {
     id: string;
   };
 }
+
+export interface SpotifyUserInfo {
+  display_name: string;
+  id: string;
+  email?: string;
+}
