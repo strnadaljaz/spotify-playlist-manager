@@ -1,4 +1,4 @@
-async function getProfile(access_token) {
+export async function getProfile(access_token) {
     let accessToken = access_token;
 
     const response = await fetch('https://api.spotify.com/v1/me', {
@@ -12,7 +12,7 @@ async function getProfile(access_token) {
     return data;
 }
 
-async function getPlaylistsData(user_id, access_token) {
+export async function getPlaylistsData(user_id, access_token) {
     const response = await fetch(`https://api.spotify.com/v1/users/${user_id}/playlists`, {
         method: 'GET',
         headers: {

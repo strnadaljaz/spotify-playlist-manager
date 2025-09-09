@@ -103,9 +103,13 @@ app.post('/getPlaylistsData', async (req, res) => {
         return res.status(400).json({ error: 'spotify_id is required' });
     }
     try {
-        const data = readData(spotify_id);
+        const data = await readData(spotify_id);
 
-        const access_token = data.access_token;
+        if (!data) {
+            return res.status(404).json({ error: 'spotify_id is required' });
+        }
+
+        let access_token = data.access_token;
         const refresh_token = data.refresh_token;
         const expires = new Date(data.expires);
 
@@ -122,11 +126,14 @@ app.post('/getPlaylistsData', async (req, res) => {
             access_token = new_access_token;
         }
 
-        const playlists_data = getPlaylistsData(spotify_id, access_token);
+        const playlists_data = await getPlaylistsData(spotify_id, access_token);
 
-        return playlists_data;
+        // console.log(playlists_data);
+
+        return res.json({ playlists_data });
     } catch (error) {
-        console.error(error);
+        console.error('Error in getPlaylistsData: ', error);
+        return res.status(500).json({ error: 'Server error' });
     }
 
 });

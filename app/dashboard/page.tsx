@@ -6,11 +6,13 @@ import { useRouter } from 'next/navigation';
 export default function Dashboard() {
     const [userInfo, setUserInfo] = useState(null);
     const [token, setToken] = useState(null);
+    const [playlistsData, setPlaylistsData] = useState(null);
     const router = useRouter();
 
     useEffect(() => {
+        const spotify_id = localStorage.getItem("spotify_id");
+
         const fetchToken = async () => {
-            const spotify_id = localStorage.getItem("spotify_id");
             
             if (!spotify_id) {
                 router.push('/');
@@ -39,7 +41,37 @@ export default function Dashboard() {
             }
         };
 
+        const fetchPlaylistsData = async () => {
+            if (!spotify_id) {
+                router.push('/');
+                return;
+            }
+
+            try {
+                const response = await fetch("http://127.0.0.1:3001/getPlaylistsData", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ spotify_id })
+                });
+
+                if (!response.ok) {
+                    router.push('/');
+                    return;
+                }
+
+                const data = await response.json();
+                setPlaylistsData(data.playlists_data);
+
+            } catch (error) {
+                console.error(error);
+                router.push('/');
+            }
+        }
+
         fetchToken();
+        fetchPlaylistsData();
     }, [router]);
 
     useEffect(() => {
@@ -67,7 +99,7 @@ export default function Dashboard() {
             }
         };
 
-        fetchUserInfo();
+        fetchUserInfo()
     }, [token, router]);
 
     return (
