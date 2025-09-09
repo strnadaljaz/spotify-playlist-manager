@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { SpotifyPlaylist } from "./defines";
 
 export default function Dashboard() {
     const [userInfo, setUserInfo] = useState(null);
     const [token, setToken] = useState(null);
-    const [playlistsData, setPlaylistsData] = useState(null);
+    const [playlistsData, setPlaylistsData] = useState<SpotifyPlaylist[]>([]);
     const router = useRouter();
 
     useEffect(() => {
@@ -62,7 +63,7 @@ export default function Dashboard() {
                 }
 
                 const data = await response.json();
-                setPlaylistsData(data.playlists_data);
+                setPlaylistsData(data.playlists_data.items);
 
             } catch (error) {
                 console.error(error);
@@ -104,14 +105,48 @@ export default function Dashboard() {
 
     return (
         <div className="min-h-screen bg-black p-8">
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-6xl mx-auto">
                 <h1 className="text-white text-4xl font-bold mb-8">Dashboard</h1>
                 {userInfo && (
-                    <div className="bg-gray-800 p-6 rounded-lg">
+                    <div className="bg-gray-800 p-6 rounded-lg mb-8">
                         <h2 className="text-white text-xl mb-4">Welcome, {userInfo.display_name}</h2>
                         <p className="text-gray-300">You're successfully authenticated with Spotify.</p>
                     </div>
                 )}
+                
+                {/* Playlists Section */}
+                <div className="mb-8">
+                    <h2 className="text-white text-2xl font-semibold mb-6">Your Playlists</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                        {playlistsData && playlistsData.map((playlist) => (
+                            <div 
+                                key={playlist.id} 
+                                className="bg-gray-800 rounded-lg p-4 hover:bg-gray-700 transition-colors duration-200 cursor-pointer group"
+                            >
+                                <div className="aspect-square mb-4 overflow-hidden rounded-md">
+                                    <img 
+                                        src={playlist.images[0]?.url || '/placeholder-playlist.png'} 
+                                        alt={`${playlist.name} playlist cover`}
+                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <h3 className="text-white font-medium text-sm line-clamp-2 leading-tight">
+                                        {playlist.name}
+                                    </h3>
+                                    <p className="text-gray-400 text-xs">
+                                        {playlist.tracks?.total || 0} tracks
+                                    </p>
+                                    {playlist.description && (
+                                        <p className="text-gray-500 text-xs line-clamp-2 mt-1">
+                                            {playlist.description}
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
         </div>
     );
