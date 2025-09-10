@@ -1,8 +1,11 @@
+// Napisi funkcijo za pridobivanje novega access tokena
+
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import { writeData, readData } from './database.mjs';
-import { getProfile, getPlaylistsData } from './spotify.mjs';
+import { getProfile, getPlaylistsData, getTracks, checkAccessToken } from './spotify.mjs';
+import { access } from 'fs';
 
 dotenv.config();
 const app = express();
@@ -20,26 +23,6 @@ const redirectURI = process.env.REDIRECT_URI || 'http://127.0.0.1:3000/callback'
 const AuthLink = 'https://accounts.spotify.com/authorize?';
 const scope = 'playlist-read-private playlist-modify-public playlist-modify-private';
 const state = Math.random().toString(36).substring(2, 15);
-
-async function getNewTokens(refreshToken, clientId) {
-    const url = "https://accounts.spotify.com/api/token";
-
-    const payload = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body: new URLSearchParams({
-        grant_type: 'refresh_token',
-        refresh_token: refreshToken,
-        client_id: clientId
-      }),
-    }
-    const body = await fetch(url, payload);
-    const response = await body.json();
-
-    return response;
-}
 
 function getAuthorizationUrl() {
     const url = AuthLink + new URLSearchParams({
@@ -70,26 +53,14 @@ app.post('/getAccessToken', async (req, res) => {
             return res.status(404).json({ error: 'User not found' });
         }
         
-        const access_token = data.access_token;
+        let access_token = data.access_token;
         const refresh_token = data.refresh_token;
         const expires = new Date(data.expires);
 
-        if (Date.now() + 120000 < expires) {
-            return res.json({ access_token: access_token });
-        }
-        // Get new access_token
-        else {
-            const newData = await getNewTokens(refresh_token, clientID);
-            const new_access_token = newData.access_token;
-            const new_expires_in = newData.expires_in;
-            const now = Date.now();
-            const new_expires = new Date(now + new_expires_in * 1000);
-            const new_refresh_token = newData.refresh_token;
+        access_token = await checkAccessToken(access_token, refresh_token, expires, spotify_id);
 
-            await writeData(spotify_id, new_access_token, new_refresh_token, new_expires.toString());
-
-            return res.json({ access_token: new_access_token });
-        }
+        return res.json({ access_token: access_token });
+        
     } catch (error) {
         console.error('Database error:', error);
         return res.status(500).json({ error: 'Database error' });
@@ -113,22 +84,9 @@ app.post('/getPlaylistsData', async (req, res) => {
         const refresh_token = data.refresh_token;
         const expires = new Date(data.expires);
 
-        if (!(Date.now() + 120000 < expires)) {
-            const newData = await getNewTokens(refresh_token, clientID);
-            const new_access_token = newData.access_token;
-            const new_expires_in = newData.expires_in;
-            const now = Date.now();
-            const new_expires = new Date(now + new_expires_in * 1000);
-            const new_refresh_token = newData.refresh_token;
-
-            await writeData(spotify_id, new_access_token, new_refresh_token, new_expires.toString());
-
-            access_token = new_access_token;
-        }
+        access_token = await checkAccessToken(access_token, refresh_token, expires, spotify_id);
 
         const playlists_data = await getPlaylistsData(spotify_id, access_token);
-
-        // console.log(playlists_data);
 
         return res.json({ playlists_data });
     } catch (error) {
@@ -195,6 +153,16 @@ app.get('/callback', (req, res) => {
         message: 'This endpoint expects a POST request from the frontend',
         query: req.query 
     });
+});
+
+app.post('/getTracks', (req, res) => {
+    const { playlist_id } = req.body;
+
+    if (!playlist_id) {
+        return res.status(400).json({ error: 'No playlist id' });
+    }
+
+
 });
 
 const PORT = process.env.PORexpiresT || 3001;

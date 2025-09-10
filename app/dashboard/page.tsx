@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { SpotifyPlaylist, SpotifyUserInfo } from "./defines";
+import { SpotifyPlaylist, SpotifyUserInfo, PlaylistTrack } from "./defines";
 
 export default function Dashboard() {
     const [userInfo, setUserInfo] = useState<SpotifyUserInfo | null>(null);
@@ -103,6 +103,10 @@ export default function Dashboard() {
         fetchUserInfo()
     }, [token, router]);
 
+    const handlePlaylistClick = (playlistId: string) => {
+        router.push(`/dashboard/playlist/${playlistId}`);
+    }
+
     return (
         <div className="min-h-screen bg-black p-8">
             <div className="max-w-6xl mx-auto">
@@ -122,6 +126,7 @@ export default function Dashboard() {
                             <div 
                                 key={playlist.id} 
                                 className="bg-gray-800 rounded-lg p-4 hover:bg-gray-700 transition-colors duration-200 cursor-pointer group"
+                                onClick={() => handlePlaylistClick(playlist.id)}
                             >
                                 <div className="aspect-square mb-4 overflow-hidden rounded-md">
                                     <img 
