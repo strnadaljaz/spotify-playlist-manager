@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import { writeData, readData } from './database.mjs';
 import { getProfile, getPlaylistsData, getTracks, checkAccessToken } from './spotify.mjs';
-import { access } from 'fs';
+import { access, read } from 'fs';
 
 dotenv.config();
 const app = express();
@@ -147,22 +147,37 @@ app.post('/callback', async (req, res) => {
     }
 });
 
-// Keep the GET route for direct browser redirects (optional, for debugging)
-app.get('/callback', (req, res) => {
-    res.json({ 
-        message: 'This endpoint expects a POST request from the frontend',
-        query: req.query 
-    });
-});
-
-app.post('/getTracks', (req, res) => {
-    const { playlist_id } = req.body;
+app.post('/getTracks', async (req, res) => {
+    const { playlist_id, spotify_id } = req.body;
 
     if (!playlist_id) {
         return res.status(400).json({ error: 'No playlist id' });
     }
 
+    if (!spotify_id) {
+        return res.status(400).json({ error: 'No spotify id' });
+    }
 
+    try {
+        const data = await readData(spotify_id);
+        
+        if (!data) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        
+        let access_token = data.access_token;
+        const refresh_token = data.refresh_token;
+        const expires = new Date(data.expires);
+
+        access_token = await checkAccessToken(access_token, refresh_token, expires, spotify_id);
+
+        const tracks = await getTracks(playlist_id, access_token);
+
+        res.json({tracks: tracks});
+    } catch (error) {
+        console.error('Error in getTracks:', error);
+        return res.status(500).json({ error: 'Server error' });
+    }
 });
 
 const PORT = process.env.PORexpiresT || 3001;

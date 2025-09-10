@@ -10,7 +10,9 @@ export default function PlaylistDetail() {
 
     const params = useParams();
     const playlistId = params.id as string;
+    const spotify_id = localStorage.getItem('spotify_id');
 
+    
 
 
     return (
