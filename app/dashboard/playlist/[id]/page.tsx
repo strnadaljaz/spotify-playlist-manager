@@ -36,7 +36,8 @@ export default function PlaylistDetail() {
                 }
 
                 const data = await response.json();
-                setTracks(data);
+                setTracks(data.tracks.tracks);
+                setPlaylist(data.tracks);
             } catch (error) {
                 console.error('Error getting tracks:" ', error);
                 router.push('/');
@@ -47,7 +48,8 @@ export default function PlaylistDetail() {
     }, [router, playlist_id]);
 
     useEffect(() => {
-        console.log(tracks);
+        //console.log(tracks);
+        //console.log("playlist: ", playlist);
     }, [tracks]);
 
     const formatDuration = (ms: number) => {
@@ -56,7 +58,7 @@ export default function PlaylistDetail() {
         return `${minutes}:${seconds.toString().padStart(2, '0')}`;
     };
 
-    if (!tracks || !tracks.tracks || !tracks.tracks.items) {
+    if (!tracks || !playlist) {
         return (
           <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white flex items-center justify-center">
             <div className="text-center">
@@ -73,18 +75,21 @@ export default function PlaylistDetail() {
             <div className="bg-gradient-to-b from-green-800 to-green-900 p-8">
                 <button 
                     onClick={() => router.back()}
-                    className="mb-4 text-gray-300 hover:text-white transition-colors"
+                    className="mb-4 text-gray-300 hover:text-white transition-colors cursor-pointer"
                 >
                     ← Back to Playlists
                 </button>
                 <div className="flex items-center space-x-6">
                     <div className="w-48 h-48 bg-gray-700 rounded-lg shadow-2xl flex items-center justify-center">
-                        <div className="text-6xl">🎵</div>
+                        <div className="text-6xl">
+                            <img src={playlist.images[0].url} alt="" />
+                        </div>
                     </div>
                     <div>
                         <p className="text-sm uppercase tracking-wide text-gray-300 mb-2">Playlist</p>
-                        <h1 className="text-5xl font-bold mb-4">Playlist Details</h1>
-                        <p className="text-gray-300">{tracks.tracks.total} songs</p>
+                        <h1 className="text-5xl font-bold mb-4">{playlist.name}</h1>
+                        <h2>{playlist.description}</h2>
+                        <p className="text-gray-300">{tracks.total} songs</p>
                     </div>
                 </div>
             </div>
@@ -102,7 +107,7 @@ export default function PlaylistDetail() {
 
                     {/* Track Items */}
                     <div className="space-y-1">
-                        {tracks.tracks.items.map((item, index) => (
+                        {tracks.items.map((item, index) => (
                             <div 
                                 key={item.track.id}
                                 className="grid grid-cols-12 gap-4 px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors group cursor-pointer"
@@ -150,7 +155,7 @@ export default function PlaylistDetail() {
                     </div>
 
                     {/* Empty state */}
-                    {tracks.tracks.items.length === 0 && (
+                    {tracks.items.length === 0 && (
                         <div className="text-center py-16">
                             <div className="text-6xl mb-4">🎵</div>
                             <h3 className="text-xl font-semibold text-gray-300 mb-2">No tracks found</h3>

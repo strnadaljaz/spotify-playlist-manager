@@ -89,5 +89,17 @@ export async function getTracks(playlist_id, access_token) {
 
     const tracks = data.tracks;
 
-    return tracks;
+    return data;
 }
+
+// export async function getPlaylistDetails(playlist_id, access_token) {
+//     const response = await fetch(`https://api.spotify.com/v1/playlists/${playlist_id}`, {
+//         method: 'GET',
+//         headers: {
+//             'Authorization': `Bearer ${access_token}`,
+//             'Content-Type': 'application/json'
+//         }
+//     });
+
+
+// }
