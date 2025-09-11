@@ -1,6 +1,6 @@
 # Spotify Playlist Manager
 
-A minimal full-stack application for authenticating with Spotify, browsing a user's playlists, and viewing tracks inside each playlist.
+A minimal full-stack application project for authenticating with Spotify, browsing a user's playlists, and viewing tracks inside each playlist.
 
 Frontend will be deployed on Vercel (Next.js App Router). Backend (Express) will run as a separate service (e.g. Render) acting as a secure proxy for the Spotify Web API and handling token refresh & persistence (Firebase Realtime Database).
 
