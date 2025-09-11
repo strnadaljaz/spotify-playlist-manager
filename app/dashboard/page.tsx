@@ -7,7 +7,7 @@ import { SpotifyPlaylist, SpotifyUserInfo, PlaylistTrack } from "./defines";
 export default function Dashboard() {
     const [userInfo, setUserInfo] = useState<SpotifyUserInfo | null>(null);
     const [token, setToken] = useState(null);
-    const [playlistsData, setPlaylistsData] = useState<SpotifyPlaylist[]>([]);
+    const [playlistsData, setPlaylistsData] = useState<SpotifyPlaylist[] | null>(null);
     const router = useRouter();
 
     useEffect(() => {
@@ -35,7 +35,7 @@ export default function Dashboard() {
                 }
 
                 const data = await response.json();
-                setToken(data.access_token); // Assuming your API returns { access_token: "..." }
+                setToken(data.access_token); 
             } catch (error) {
                 console.error('Error fetching token:', error);
                 router.push('/');
@@ -105,6 +105,17 @@ export default function Dashboard() {
 
     const handlePlaylistClick = (playlistId: string) => {
         router.push(`/dashboard/playlist/${playlistId}`);
+    }
+
+    if (!playlistsData) {
+        return (
+          <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white flex items-center justify-center">
+            <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
+                <p className="text-gray-300">Loading playlists...</p>
+            </div>
+          </div>  
+        );
     }
 
     return (

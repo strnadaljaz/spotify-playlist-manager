@@ -27,10 +27,32 @@ export interface SpotifyUserInfo {
 
 export interface PlaylistTrack {
   track: {
-    id:string;
+    id: string;
     name: string;
-    artists: Array<{ name: string }>;
-    album: { name: string};
+    artists: Array<{ 
+      name: string;
+      id: string;
+    }>;
+    album: {
+      name: string;
+      images: Array<{
+        url: string;
+        height: number | null;
+        width: number | null;
+      }>;
+    };
     duration_ms: number;
+  };
+}
+
+export interface Tracks {
+  tracks: {
+    href: string;
+    limit: number;
+    next: string | null;
+    offset: number;
+    previous: string | null;
+    total: number;
+    items: Array<PlaylistTrack>;
   };
 }
