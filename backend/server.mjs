@@ -5,13 +5,12 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import { writeData, readData } from './database.mjs';
 import { getProfile, getPlaylistsData, getTracks, checkAccessToken } from './spotify.mjs';
-import { access, read } from 'fs';
 
 dotenv.config();
 const app = express();
 
 app.use(cors({
-    origin: ['http://127.0.0.1:3000', 'http://localhost:3000', 'https://spotify-playlist-manager-backend-atej.onrender.com'], 
+    origin: ['http://127.0.0.1:3000', 'http://localhost:3000'], 
 }));
 
 app.use(express.json());
