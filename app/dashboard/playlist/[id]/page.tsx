@@ -36,7 +36,13 @@ export default function PlaylistDetail() {
                 return;
             }
 
-            window.location.reload();
+            if (tracks) {
+                setTracks({
+                    ...tracks,
+                    items: tracks.items.filter(item => item.track.id !== track_id),
+                    total: tracks.total - 1
+                });
+            }
         } catch (error) {
             console.error('Error removing track:', error);
         }
