@@ -9,8 +9,38 @@ export default function PlaylistDetail() {
     const [tracks, setTracks] = useState<Tracks | null>(null);
     const router = useRouter();
     
+    const userId = localStorage.getItem('spotify_id');
+
     const params = useParams();
     const playlist_id = params.id as string;
+
+    async function removeTrack(track_id: string) {
+        const tracksToRemove = { 'tracks': [{'uri': `spotify:track:${track_id}`}] };
+
+        try {
+            const response = await fetch("http://127.0.0.1:3001/removeTrack", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify ({
+                    playlist_id: playlist_id,
+                    tracks: tracksToRemove,
+                    user_id: userId
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Failed to remove track:', errorData);
+                return;
+            }
+
+            window.location.reload();
+        } catch (error) {
+            console.error('Error removing track:', error);
+        }
+    }
 
     useEffect(() => {
         const spotify_id = localStorage.getItem('spotify_id');
@@ -48,7 +78,7 @@ export default function PlaylistDetail() {
     }, [router, playlist_id]);
 
     useEffect(() => {
-        //console.log(tracks);
+        console.log(tracks);
         //console.log("playlist: ", playlist);
     }, [tracks]);
 
@@ -98,11 +128,12 @@ export default function PlaylistDetail() {
             <div className="p-8">
                 <div className="max-w-6xl mx-auto">
                     {/* Table Header */}
-                    <div className="grid grid-cols-12 gap-4 px-6 py-3 text-gray-400 text-sm border-b border-gray-700 mb-4">
+                    <div className="grid grid-cols-13 gap-4 px-6 py-3 text-gray-400 text-sm border-b border-gray-700 mb-4">
                         <div className="col-span-1">#</div>
                         <div className="col-span-6">Title</div>
                         <div className="col-span-3">Album</div>
                         <div className="col-span-2 text-right">Duration</div>
+                        <div className="col-span-1"></div>
                     </div>
 
                     {/* Track Items */}
@@ -110,14 +141,14 @@ export default function PlaylistDetail() {
                         {tracks.items.map((item, index) => (
                             <div 
                                 key={item.track.id}
-                                className="grid grid-cols-12 gap-4 px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors group cursor-pointer"
+                                className="grid grid-cols-13 gap-4 px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors group"
                             >
                                 {/* Track Number */}
                                 <div className="col-span-1 flex items-center">
                                     <span className="text-gray-400 text-sm group-hover:hidden">
                                         {index + 1}
                                     </span>
-                                    <button className="hidden group-hover:block text-white hover:text-green-500">
+                                    <button className="hidden group-hover:block text-white hover:text-green-500 cursor-pointer">
                                         ▶
                                     </button>
                                 </div>
@@ -150,6 +181,17 @@ export default function PlaylistDetail() {
                                         {formatDuration(item.track.duration_ms)}
                                     </span>
                                 </div>
+
+                                {/* Delete Button */}
+                                <div className="col-span-1 flex items-center justify-center">
+                                    <div
+                                        className="cursor-pointer text-gray-400 hover:text-red-500 transition-colors"
+                                        onClick={() => removeTrack(item.track.id)}
+                                    >
+                                        x
+                                    </div>
+                                </div>
+
                             </div>
                         ))}
                     </div>

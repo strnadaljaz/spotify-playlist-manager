@@ -87,19 +87,34 @@ export async function getTracks(playlist_id, access_token) {
 
     const data = await response.json();
 
-    const tracks = data.tracks;
+    let nextUrl = data.tracks.next;
+
+    if (nextUrl) {
+        let allTracks = [...data.tracks.items];
+        
+        while (nextUrl) {
+            const nextResponse = await fetch(nextUrl, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${access_token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!nextResponse.ok) {
+                console.error('Error fetching next page: ', nextResponse.statusText);
+                break;
+            }
+
+            const nextData = await nextResponse.json();
+            allTracks = [...allTracks, ...nextData.items];
+            nextUrl = nextData.next;
+        }
+
+        data.tracks.items = allTracks
+        data.tracks.total = allTracks.length;
+        data.tracks.next = null;
+    }
 
     return data;
 }
-
-// export async function getPlaylistDetails(playlist_id, access_token) {
-//     const response = await fetch(`https://api.spotify.com/v1/playlists/${playlist_id}`, {
-//         method: 'GET',
-//         headers: {
-//             'Authorization': `Bearer ${access_token}`,
-//             'Content-Type': 'application/json'
-//         }
-//     });
-
-
-// }

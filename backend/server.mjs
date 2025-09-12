@@ -179,6 +179,54 @@ app.post('/getTracks', async (req, res) => {
     }
 });
 
+app.post('/removeTrack', async (req, res) => {
+    const { playlist_id, tracks, user_id } = req.body;
+
+    if (!playlist_id) {
+        return res.status(400).json({ error: "No playlist id" });
+    }
+
+    if (!tracks) {
+        return res.status(400).json({ error: "No tracks" });
+    }
+
+    if (!user_id) {
+        return res.status(400).json({ error: 'No user id' });
+    }
+    
+    const url = `https://api.spotify.com/v1/playlists/${playlist_id}/tracks`;
+
+    try {
+        const data = await readData(user_id);
+        
+        if (!data) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const refresh_token = data.refresh_token;
+        const expires = new Date(data.expires);
+        const access_token = await checkAccessToken(data.access_token, refresh_token, expires);
+
+        const response = await fetch(url, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${access_token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(tracks)
+        });
+
+        if (!response.ok) {
+            console.error(response.message);
+        }
+        
+        return res.status(200).json({ success: true, message: 'Track removed successfully' });
+    } catch (error) {
+        console.error("Error removing the track: ", error);
+        return res.status(500).json({ error: 'server error' });
+    }
+});
+
 const PORT = process.env.PORexpiresT || 3001;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

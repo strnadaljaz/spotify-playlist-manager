@@ -26,10 +26,10 @@ export function writeData(spotify_id, access_token, refresh_token, expires) {
     });
 }
 
-export async function readData(spotify_id) {
+export async function readData(user_id) {
     const dbRef = ref(getDatabase());
     try {
-        const snapshot = await get(child(dbRef, `users/${spotify_id}`));
+        const snapshot = await get(child(dbRef, `users/${user_id}`));
         if (snapshot.exists()) {
             return snapshot.val();
         } else {
