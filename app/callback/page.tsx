@@ -44,8 +44,6 @@ export default function Callback() {
                     return;
                 }
                 
-                
-
                 setStatus('Authentication successful! Redirecting...');
                 
                 // Redirect to dashboard or main app

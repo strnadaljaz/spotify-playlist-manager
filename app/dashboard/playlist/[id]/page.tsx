@@ -7,14 +7,59 @@ import { SpotifyPlaylist, PlaylistTrack, Tracks } from "../../defines";
 export default function PlaylistDetail() {
     const [playlist, setPlaylist] = useState<SpotifyPlaylist | null>(null);
     const [tracks, setTracks] = useState<Tracks | null>(null);
+    const [searchText, setSearchText] = useState<string>('');
+    const [searchResults, setSearchResults] = useState<any[]>([]);
     const router = useRouter();
     
-    const userId = localStorage.getItem('spotify_id');
+    const [userId, setUserId] = useState<string | null>(null);
 
     const params = useParams();
     const playlist_id = params.id as string;
 
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const spotify_id = localStorage.getItem('spotify_id');
+            setUserId(spotify_id);
+
+            if (!spotify_id) {
+                router.push('/');
+                return;
+            }
+
+            const getTracks = async () => {
+
+                try {
+                    const response = await fetch("http://192.168.68.110:3001/getTracks", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ playlist_id, spotify_id })
+                    });
+
+                    if (!response.ok) {
+                        router.push('/');
+                        return;
+                    }
+
+                    const data = await response.json();
+                    setTracks(data.tracks.tracks);
+                    setPlaylist(data.tracks);
+                } catch (error) {
+                    console.error('Error getting tracks:" ', error);
+                    router.push('/');
+                }
+            }
+            getTracks();
+        }
+    }, [router, playlist_id]);
+
     async function removeTrack(track_id: string) {
+        if (!userId) {
+            console.error('User ID not available');
+            return;
+        }
+        
         const tracksToRemove = { 'tracks': [{'uri': `spotify:track:${track_id}`}] };
 
         try {
@@ -48,51 +93,60 @@ export default function PlaylistDetail() {
         }
     }
 
-    useEffect(() => {
-        const spotify_id = localStorage.getItem('spotify_id');
-
-        const getTracks = async () => {
-            if (!spotify_id) {
-                router.push('/');
-                return;
-            }
-
-            try {
-                const response = await fetch("http://127.0.0.1:3001/getTracks", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ playlist_id, spotify_id })
-                });
-
-                if (!response.ok) {
-                    router.push('/');
-                    return;
-                }
-
-                const data = await response.json();
-                setTracks(data.tracks.tracks);
-                setPlaylist(data.tracks);
-            } catch (error) {
-                console.error('Error getting tracks:" ', error);
-                router.push('/');
-            }
-        }
-
-        getTracks();
-    }, [router, playlist_id]);
-
-    useEffect(() => {
-        console.log(tracks);
-        //console.log("playlist: ", playlist);
-    }, [tracks]);
+    // For debugging
+    // useEffect(() => {
+    //     console.log(tracks);
+    //     console.log("playlist: ", playlist);
+    // }, [tracks]);
 
     const formatDuration = (ms: number) => {
         const minutes = Math.floor(ms / 60000);
         const seconds = Math.floor((ms % 60000) / 1000);
         return `${minutes}:${seconds.toString().padStart(2, '0')}`;
     };
+
+    async function search(search_text: string) {
+        if (!search_text || !userId) {
+            console.error("no search text or userID");
+            return;
+        }
+        
+        try {
+            const response = await fetch('http://127.0.0.1:3001/search', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    search_text: search_text,
+                    spotify_id: userId
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Failed to search:', errorData);
+                return;
+            }
+
+            const data = await response.json();
+            setSearchResults(data.tracks);
+        } catch(error) {
+            console.error("error submiting search", error);
+        }
+    }
+
+    useEffect(() => {
+        if (searchText.trim()) {
+            const timeoutId = setTimeout(() => {
+                search(searchText);
+            }, 500); // Wait 500ms after user stops typing
+
+            return () => clearTimeout(timeoutId);
+        } else {
+            setSearchResults([]);
+        }
+    }, [searchText, userId]);
 
     if (!tracks || !playlist) {
         return (
@@ -133,6 +187,56 @@ export default function PlaylistDetail() {
             {/* Tracks List */}
             <div className="p-8">
                 <div className="max-w-6xl mx-auto">
+                    
+                    <div className="mb-6 flex items-center space-x-3 max-w-md">
+                        <div className="relative flex-1">
+                            <input 
+                                type="text" 
+                                placeholder="Add tracks..."
+                                className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-400 focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-colors"
+                                onChange={(e) => setSearchText(e.target.value)}
+                                value={searchText}
+                            />
+                            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Search results */}
+                    {searchResults.length > 0 && (
+                        <div className="mb-6 bg-gray-800 rounded-lg p-4">
+                            <h3 className="text-lg font-semibold mb-4">Search Results</h3>
+                            <div className="space-y-2 max-h-60 overflow-y-auto">
+                                {searchResults.map((track) => (
+                                    <div 
+                                        key={track.id}
+                                        className="flex items-center space-x-4 p-2 hover:bg-gray-700 rounded cursor-pointer"
+                                        onClick={() => {
+                                            // Add function to add track to playlist
+                                            console.log('Add track:', track.id);
+                                        }}
+                                    >
+                                        <img 
+                                            src={track.album.images[2]?.url} 
+                                            alt={track.name}
+                                            className="w-10 h-10 rounded"
+                                        />
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-white font-medium truncate">{track.name}</p>
+                                            <p className="text-gray-400 text-sm truncate">
+                                                {track.artists.map((artist: any) => artist.name).join(', ')}
+                                            </p>
+                                        </div>
+                                        <span className="text-green-500 text-sm">+ Add</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                     {/* Table Header */}
                     <div className="grid grid-cols-13 gap-4 px-6 py-3 text-gray-400 text-sm border-b border-gray-700 mb-4">
                         <div className="col-span-1">#</div>

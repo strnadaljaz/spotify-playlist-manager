@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import { writeData, readData } from './database.mjs';
 import { getProfile, getPlaylistsData, getTracks, checkAccessToken } from './spotify.mjs';
+import { captureOwnerStack } from 'react';
 
 dotenv.config();
 const app = express();
@@ -224,6 +225,56 @@ app.post('/removeTrack', async (req, res) => {
     } catch (error) {
         console.error("Error removing the track: ", error);
         return res.status(500).json({ error: 'server error' });
+    }
+});
+
+app.post('/search', async (req, res) => {
+    const { search_text, spotify_id } = req.body;
+
+    if (!search_text) {
+        return res.status(400).json({ error: 'Search text is required' });
+    }
+
+    if (!spotify_id) {
+        return res.status(400).json({ error: 'Spotify id is required' });
+    }
+
+    try {
+        const data = await readData(spotify_id);
+
+        if (!data) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        let access_token = data.access_token;
+        const refresh_token = data.refresh_token;
+        const expires = new Date(data.expires);
+
+        access_token = await checkAccessToken(access_token, refresh_token, expires, spotify_id);
+
+        const searchUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(search_text)}&type=track&limit=20`;
+
+        const response = await fetch(searchUrl, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${access_token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            console.error('Spotify API error:', response.status, response.statusText);
+            return res.status(response.status).json({ error: 'Spotify API error' });
+        }
+
+        const searchResults = await response.json();
+
+        res.json({
+            tracks: searchResults.tracks.items
+        });
+    } catch (error) {
+        console.error('Error in search:', error);
+        return res.status(500).json({ error: 'Server error' });
     }
 });
 
