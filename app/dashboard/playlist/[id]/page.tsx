@@ -1,14 +1,15 @@
 'use client';
 
-import { useEffect, useState} from "react";
+import { useEffect, useState, useCallback} from "react";
 import { useRouter, useParams } from "next/navigation";
 import { SpotifyPlaylist, Tracks, SpotifyTrack } from "../../defines";
+import Image from "next/image";
 
 export default function PlaylistDetail() {
     const [playlist, setPlaylist] = useState<SpotifyPlaylist | null>(null);
     const [tracks, setTracks] = useState<Tracks | null>(null);
     const [searchText, setSearchText] = useState<string>('');
-    const [searchResults, setSearchResults] = useState<any[]>([]);
+    const [searchResults, setSearchResults] = useState<SpotifyTrack[]>([]);
     const router = useRouter();
     
     const [userId, setUserId] = useState<string | null>(null);
@@ -105,7 +106,7 @@ export default function PlaylistDetail() {
         return `${minutes}:${seconds.toString().padStart(2, '0')}`;
     };
 
-    async function search(search_text: string) {
+    const search = useCallback(async (search_text: string) => {
         if (!search_text || !userId) {
             console.error("no search text or userID");
             return;
@@ -134,7 +135,7 @@ export default function PlaylistDetail() {
         } catch(error) {
             console.error("error submiting search", error);
         }
-    }
+    }, [userId]);
 
     useEffect(() => {
         if (searchText.trim()) {
@@ -146,7 +147,7 @@ export default function PlaylistDetail() {
         } else {
             setSearchResults([]);
         }
-    }, [searchText, userId]);
+    }, [searchText, search]);
 
     async function addTrack(track_id: string){
         if (!track_id || !userId || !playlist_id) {
@@ -209,7 +210,13 @@ export default function PlaylistDetail() {
                 <div className="flex items-center space-x-6">
                     <div className="w-48 h-48 bg-gray-700 rounded-lg shadow-2xl flex items-center justify-center">
                         <div className="text-6xl">
-                            <img src={playlist.images[0].url} alt="" />
+                            <Image 
+                                src={playlist.images[0].url} 
+                                alt={`${playlist.name} playlist cover`}
+                                width={192}
+                                height={192}
+                                className="rounded-lg"
+                            />
                         </div>
                     </div>
                     <div>
@@ -254,15 +261,17 @@ export default function PlaylistDetail() {
                                         key={track.id}
                                         className="flex items-center space-x-4 p-2 hover:bg-gray-700 rounded cursor-pointer"
                                         onClick={() => addTrack(track.id)}>
-                                        <img
-                                            src={track.album.images[2]?.url} 
+                                        <Image
+                                            src={track.album.images[2]?.url || "/placeholder-album.png"} 
                                             alt={track.name}
+                                            width={40}
+                                            height={40}
                                             className="w-10 h-10 rounded"
                                         />
                                         <div className="flex-1 min-w-0">
                                             <p className="text-white font-medium truncate">{track.name}</p>
                                             <p className="text-gray-400 text-sm truncate">
-                                                {track.artists.map((artist: any) => artist.name).join(', ')}
+                                                {track.artists.map((artist) => artist.name).join(', ')}
                                             </p>
                                         </div>
                                         <span className="text-green-500 text-sm">+ Add</span>
@@ -301,7 +310,13 @@ export default function PlaylistDetail() {
                                 {/* Title and Artist */}
                                 <div className="col-span-6 flex items-center space-x-4">
                                     <div className="w-12 h-12 bg-gray-700 rounded flex items-center justify-center flex-shrink-0">
-                                        <span className="text-gray-400 text-xl"><img src={item.track.album.images[2].url} alt="" /></span>
+                                        <Image 
+                                            src={item.track.album.images[2]?.url || "/placeholder-album.png"} 
+                                            alt={item.track.name}
+                                            width={48}
+                                            height={48}
+                                            className="w-12 h-12 rounded"
+                                        />
                                     </div>
                                     <div className="min-w-0">
                                         <p className="text-white font-medium truncate">
