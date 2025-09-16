@@ -278,6 +278,58 @@ app.post('/search', async (req, res) => {
     }
 });
 
+app.post('/addTrack', async (req, res) => {
+    const { playlist_id, track_id, spotify_id } = req.body;
+
+    if (!playlist_id) {
+        return res.status(400).json({ error: "no playlist id" });
+    }
+
+    if (!spotify_id) {
+        return res.status(400).json({ error: "no spotify id" });
+    }
+
+    if (!track_id) {
+        return res.status(400).json({ error: 'no track id' });
+    }
+
+    try {
+        const data = await readData(spotify_id);
+        if (!data) {
+            return res.status(404).json({ error: 'user not found' });
+        }
+
+        let access_token = data.access_token;
+        const refresh_token = data.refresh_token;
+        const expires = new Date(data.expires);
+        access_token = await checkAccessToken(access_token, refresh_token, expires, spotify_id);
+
+        const response = await fetch(`https://api.spotify.com/v1/playlists/${playlist_id}/tracks`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${access_token}`,
+                'Content-Type': 'application/json'  
+            },
+            body: JSON.stringify({
+                uris: [`spotify:track:${track_id}`]
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            return res.status(response.status).json({ error: errorData });
+        }
+
+        const response_data = await response.json();
+        console.log(response_data);
+
+        return res.status(200).json({ success: true, message: 'Track added successfully' });
+    } catch (error) {
+        console.error('Error adding track: ', error);
+        return res.status(500).json({ error: 'Server error' });
+    }
+});
+
 const PORT = process.env.PORexpiresT || 3001;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

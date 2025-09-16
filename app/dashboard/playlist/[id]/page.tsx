@@ -148,6 +148,43 @@ export default function PlaylistDetail() {
         }
     }, [searchText, userId]);
 
+    async function addTrack(track_id: string){
+        if (!track_id || !userId || !playlist_id) {
+            console.error("something is missing: ", track_id, userId, playlist_id);
+            return;
+        }
+
+        try {
+            const response = await fetch("http://127.0.0.1:3001/addTrack", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    playlist_id: playlist_id,
+                    track_id: track_id,
+                    spotify_id: userId
+                })
+            });
+
+            if (!response.ok) {
+                if (response.status === 403) {
+                    console.error('Cant add track. This playlist is not yours!');
+                }
+                else {
+                    const errorData = await response.json();
+                    console.error('Failed to add track:', errorData);
+                }
+                return;
+            }
+
+            window.location.reload();
+            // Add track to the track list
+        } catch (error) {
+            console.error("Error submiting add track", error);
+        }
+    }
+
     if (!tracks || !playlist) {
         return (
           <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white flex items-center justify-center">
@@ -190,6 +227,7 @@ export default function PlaylistDetail() {
                     
                     <div className="mb-6 flex items-center space-x-3 max-w-md">
                         <div className="relative flex-1">
+                            
                             <input 
                                 type="text" 
                                 placeholder="Add tracks..."
@@ -202,9 +240,10 @@ export default function PlaylistDetail() {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
                             </div>
+                            
                         </div>
+                        
                     </div>
-
                     {/* Search results */}
                     {searchResults.length > 0 && (
                         <div className="mb-6 bg-gray-800 rounded-lg p-4">
@@ -214,11 +253,7 @@ export default function PlaylistDetail() {
                                     <div 
                                         key={track.id}
                                         className="flex items-center space-x-4 p-2 hover:bg-gray-700 rounded cursor-pointer"
-                                        onClick={() => {
-                                            // Add function to add track to playlist
-                                            console.log('Add track:', track.id);
-                                        }}
-                                    >
+                                        onClick={() => addTrack(track.id)}>
                                         <img 
                                             src={track.album.images[2]?.url} 
                                             alt={track.name}
