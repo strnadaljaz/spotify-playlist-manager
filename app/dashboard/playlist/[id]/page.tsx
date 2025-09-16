@@ -2,7 +2,7 @@
 
 import { useEffect, useState} from "react";
 import { useRouter, useParams } from "next/navigation";
-import { SpotifyPlaylist, Tracks } from "../../defines";
+import { SpotifyPlaylist, Tracks, SpotifyTrack } from "../../defines";
 
 export default function PlaylistDetail() {
     const [playlist, setPlaylist] = useState<SpotifyPlaylist | null>(null);

@@ -54,3 +54,18 @@ export interface Tracks {
   total: number;
   items: Array<PlaylistTrack>;
 }
+
+export interface SpotifyTrack {
+    id: string;
+    name: string;
+    artists: Array<{ name: string; id: string }>;
+    album: {
+        name: string;
+        images: Array<{
+            url: string;
+            height: number | null;
+            width: number | null;
+        }>;
+    };
+    duration_ms: number;
+}

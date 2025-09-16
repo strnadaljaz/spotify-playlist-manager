@@ -126,7 +126,7 @@ export default function Dashboard() {
                 {userInfo && (
                     <div className="bg-gray-800 p-6 rounded-lg mb-8">
                         <h2 className="text-white text-xl mb-4">Welcome, {userInfo.display_name}</h2>
-                        <p className="text-gray-300">You"re successfully authenticated with Spotify.</p>
+                        <p className="text-gray-300">You&apos;re successfully authenticated with Spotify.</p>
                     </div>
                 )}
                 
@@ -141,9 +141,11 @@ export default function Dashboard() {
                                 onClick={() => handlePlaylistClick(playlist.id)}
                             >
                                 <div className="aspect-square mb-4 overflow-hidden rounded-md">
-                                    <img
+                                    <Image
                                         src={playlist.images[0]?.url || "/placeholder-playlist.png"} 
                                         alt={`${playlist.name} playlist cover`}
+                                        width={200}
+                                        height={200}
                                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                                     />
                                 </div>

@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 
-export default function Callback() {
+function CallbackContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const [status, setStatus] = useState('Processing...');
@@ -67,5 +67,20 @@ export default function Callback() {
                 <p className="text-gray-300">{status}</p>
             </div>
         </div>
+    );
+}
+
+export default function Callback() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-black flex items-center justify-center">
+                <div className="text-center">
+                    <h1 className="text-white text-2xl mb-4">Spotify Authentication</h1>
+                    <p className="text-gray-300">Loading...</p>
+                </div>
+            </div>
+        }>
+            <CallbackContent />
+        </Suspense>
     );
 }
