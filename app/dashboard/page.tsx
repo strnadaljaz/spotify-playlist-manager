@@ -1,8 +1,9 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { SpotifyPlaylist, SpotifyUserInfo } from "./defines";
+import Image from "next/image";
 
 export default function Dashboard() {
     const [userInfo, setUserInfo] = useState<SpotifyUserInfo | null>(null);
@@ -16,49 +17,49 @@ export default function Dashboard() {
         const fetchToken = async () => {
             
             if (!spotify_id) {
-                router.push('/');
+                router.push("/");
                 return;
             }
 
             try {
                 const response = await fetch("https://spotify-playlist-manager-backend-atej.onrender.com/getAccessToken", {
-                    method: 'POST',
+                    method: "POST",
                     headers: {
-                        'Content-Type': 'application/json',
+                        "Content-Type": "application/json",
                     },
                     body: JSON.stringify({ spotify_id })
                 });
 
                 if (!response.ok) {
-                    router.push('/');
+                    router.push("/");
                     return;
                 }
 
                 const data = await response.json();
                 setToken(data.access_token); 
             } catch (error) {
-                console.error('Error fetching token:', error);
-                router.push('/');
+                console.error("Error fetching token:", error);
+                router.push("/");
             }
         };
 
         const fetchPlaylistsData = async () => {
             if (!spotify_id) {
-                router.push('/');
+                router.push("/");
                 return;
             }
 
             try {
                 const response = await fetch("https://spotify-playlist-manager-backend-atej.onrender.com/getPlaylistsData", {
-                    method: 'POST',
+                    method: "POST",
                     headers: {
-                        'Content-Type': 'application/json',
+                        "Content-Type": "application/json",
                     },
                     body: JSON.stringify({ spotify_id })
                 });
 
                 if (!response.ok) {
-                    router.push('/');
+                    router.push("/");
                     return;
                 }
 
@@ -67,7 +68,7 @@ export default function Dashboard() {
 
             } catch (error) {
                 console.error(error);
-                router.push('/');
+                router.push("/");
             }
         }
 
@@ -81,9 +82,9 @@ export default function Dashboard() {
         // Fetch user info to verify token works
         const fetchUserInfo = async () => {
             try {
-                const response = await fetch('https://api.spotify.com/v1/me', {
+                const response = await fetch("https://api.spotify.com/v1/me", {
                     headers: {
-                        'Authorization': `Bearer ${token}`
+                        "Authorization": `Bearer ${token}`
                     }
                 });
 
@@ -92,11 +93,11 @@ export default function Dashboard() {
                     setUserInfo(userData);
                 } else {
                     // Token might be expired
-                    localStorage.removeItem('spotify_access_token');
-                    router.push('/');
+                    localStorage.removeItem("spotify_access_token");
+                    router.push("/");
                 }
             } catch (error) {
-                console.error('Error fetching user info:', error);
+                console.error("Error fetching user info:", error);
             }
         };
 
@@ -125,7 +126,7 @@ export default function Dashboard() {
                 {userInfo && (
                     <div className="bg-gray-800 p-6 rounded-lg mb-8">
                         <h2 className="text-white text-xl mb-4">Welcome, {userInfo.display_name}</h2>
-                        <p className="text-gray-300">You're successfully authenticated with Spotify.</p>
+                        <p className="text-gray-300">You"re successfully authenticated with Spotify.</p>
                     </div>
                 )}
                 
@@ -140,8 +141,8 @@ export default function Dashboard() {
                                 onClick={() => handlePlaylistClick(playlist.id)}
                             >
                                 <div className="aspect-square mb-4 overflow-hidden rounded-md">
-                                    <img 
-                                        src={playlist.images[0]?.url || '/placeholder-playlist.png'} 
+                                    <img
+                                        src={playlist.images[0]?.url || "/placeholder-playlist.png"} 
                                         alt={`${playlist.name} playlist cover`}
                                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                                     />

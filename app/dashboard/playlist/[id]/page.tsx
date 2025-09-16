@@ -2,7 +2,7 @@
 
 import { useEffect, useState} from "react";
 import { useRouter, useParams } from "next/navigation";
-import { SpotifyPlaylist, PlaylistTrack, Tracks } from "../../defines";
+import { SpotifyPlaylist, Tracks } from "../../defines";
 
 export default function PlaylistDetail() {
     const [playlist, setPlaylist] = useState<SpotifyPlaylist | null>(null);
@@ -254,7 +254,7 @@ export default function PlaylistDetail() {
                                         key={track.id}
                                         className="flex items-center space-x-4 p-2 hover:bg-gray-700 rounded cursor-pointer"
                                         onClick={() => addTrack(track.id)}>
-                                        <img 
+                                        <img
                                             src={track.album.images[2]?.url} 
                                             alt={track.name}
                                             className="w-10 h-10 rounded"
