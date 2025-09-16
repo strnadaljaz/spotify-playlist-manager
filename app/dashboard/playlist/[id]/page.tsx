@@ -98,7 +98,7 @@ export default function PlaylistDetail() {
 
     // For debugging
     // useEffect(() => {
-    //     console.log(tracks);
+    //     //console.log(tracks);
     //     console.log("playlist: ", playlist);
     // }, [tracks]);
 
@@ -234,25 +234,28 @@ export default function PlaylistDetail() {
             <div className="p-8">
                 <div className="max-w-6xl mx-auto">
                     
-                    <div className="mb-6 flex items-center space-x-3 max-w-md">
-                        <div className="relative flex-1">
-                            
-                            <input 
-                                type="text" 
-                                placeholder="Add tracks..."
-                                className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-400 focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-colors"
-                                onChange={(e) => setSearchText(e.target.value)}
-                                value={searchText}
-                            />
-                            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
+                    { playlist.owner.id == userId && (
+                        <div className="mb-6 flex items-center space-x-3 max-w-md">
+                            <div className="relative flex-1">
+                                
+                                <input 
+                                    type="text" 
+                                    placeholder="Add tracks..."
+                                    className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-400 focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-colors"
+                                    onChange={(e) => setSearchText(e.target.value)}
+                                    value={searchText}
+                                />
+                                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                </div>
+                                
                             </div>
                             
                         </div>
-                        
-                    </div>
+                    )}
+                    
                     {/* Search results */}
                     {searchResults.length > 0 && (
                         <div className="mb-6 bg-gray-800 rounded-lg p-4">

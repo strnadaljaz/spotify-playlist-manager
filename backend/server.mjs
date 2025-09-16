@@ -320,9 +320,6 @@ app.post('/addTrack', async (req, res) => {
             return res.status(response.status).json({ error: errorData });
         }
 
-        const response_data = await response.json();
-        console.log(response_data);
-
         return res.status(200).json({ success: true, message: 'Track added successfully' });
     } catch (error) {
         console.error('Error adding track: ', error);
