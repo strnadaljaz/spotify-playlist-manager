@@ -348,15 +348,16 @@ export default function PlaylistDetail() {
                                 </div>
 
                                 {/* Delete Button */}
-                                <div className="col-span-1 flex items-center justify-center">
-                                    <div
-                                        className="cursor-pointer text-gray-400 hover:text-red-500 transition-colors"
-                                        onClick={() => removeTrack(item.track.id)}
-                                    >
-                                        x
+                                { playlist.owner.id == userId && (
+                                    <div className="col-span-1 flex items-center justify-center">
+                                        <div
+                                            className="cursor-pointer text-gray-400 hover:text-red-500 transition-colors"
+                                            onClick={() => removeTrack(item.track.id)}
+                                        >
+                                            x
+                                        </div>
                                     </div>
-                                </div>
-
+                                )}
                             </div>
                         ))}
                     </div>
