@@ -26,7 +26,7 @@ export default function Callback() {
         // Exchange code for access token
         const exchangeCodeForToken = async () => {
             try {
-                const response = await fetch('http://localhost:3001/callback', {
+                const response = await fetch('https://spotify-playlist-manager-backend-atej.onrender.com/callback', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

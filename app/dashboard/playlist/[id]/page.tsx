@@ -29,7 +29,7 @@ export default function PlaylistDetail() {
             const getTracks = async () => {
 
                 try {
-                    const response = await fetch("http://192.168.68.110:3001/getTracks", {
+                    const response = await fetch("https://spotify-playlist-manager-backend-atej.onrender.com/getTracks", {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -63,7 +63,7 @@ export default function PlaylistDetail() {
         const tracksToRemove = { 'tracks': [{'uri': `spotify:track:${track_id}`}] };
 
         try {
-            const response = await fetch("http://127.0.0.1:3001/removeTrack", {
+            const response = await fetch("https://spotify-playlist-manager-backend-atej.onrender.com/removeTrack", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -112,7 +112,7 @@ export default function PlaylistDetail() {
         }
         
         try {
-            const response = await fetch('http://127.0.0.1:3001/search', {
+            const response = await fetch('https://spotify-playlist-manager-backend-atej.onrender.com/search', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -155,7 +155,7 @@ export default function PlaylistDetail() {
         }
 
         try {
-            const response = await fetch("http://127.0.0.1:3001/addTrack", {
+            const response = await fetch("https://spotify-playlist-manager-backend-atej.onrender.com/addTrack", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

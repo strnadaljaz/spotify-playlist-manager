@@ -7,7 +7,7 @@ export default function Home() {
 
   const handleLoginClick = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:3001/getAuthorizationUrl', {
+      const response = await fetch('https://spotify-playlist-manager-backend-atej.onrender.com/getAuthorizationUrl', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

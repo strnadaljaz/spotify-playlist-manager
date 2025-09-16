@@ -21,7 +21,7 @@ export default function Dashboard() {
             }
 
             try {
-                const response = await fetch("http://127.0.0.1:3001/getAccessToken", {
+                const response = await fetch("https://spotify-playlist-manager-backend-atej.onrender.com/getAccessToken", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -49,7 +49,7 @@ export default function Dashboard() {
             }
 
             try {
-                const response = await fetch("http://127.0.0.1:3001/getPlaylistsData", {
+                const response = await fetch("https://spotify-playlist-manager-backend-atej.onrender.com/getPlaylistsData", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
