@@ -5,13 +5,13 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import { writeData, readData } from './database.mjs';
 import { getProfile, getPlaylistsData, getTracks, checkAccessToken } from './spotify.mjs';
-import { captureOwnerStack } from 'react';
+// import { captureOwnerStack } from 'react';
 
 dotenv.config();
 const app = express();
 
 app.use(cors({
-    origin: ['http://127.0.0.1:3000', 'http://localhost:3000'], 
+    origin: ['http://127.0.0.1:3000', 'http://localhost:3000', 'https://spotimanager.vercel.app'], 
 }));
 
 app.use(express.json());
