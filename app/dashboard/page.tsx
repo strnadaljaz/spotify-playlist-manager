@@ -11,6 +11,8 @@ export default function Dashboard() {
     const [playlistsData, setPlaylistsData] = useState<SpotifyPlaylist[] | null>(null);
     const router = useRouter();
 
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://spotify-playlist-manager-backend-atej.onrender.com';
+
     useEffect(() => {
         const spotify_id = localStorage.getItem("spotify_id");
 
@@ -22,7 +24,7 @@ export default function Dashboard() {
             }
 
             try {
-                const response = await fetch("https://spotify-playlist-manager-backend-atej.onrender.com/getAccessToken", {
+                const response = await fetch(`${backendUrl}/getAccessToken`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -50,7 +52,7 @@ export default function Dashboard() {
             }
 
             try {
-                const response = await fetch("https://spotify-playlist-manager-backend-atej.onrender.com/getPlaylistsData", {
+                const response = await fetch(`${backendUrl}/getPlaylistsData`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

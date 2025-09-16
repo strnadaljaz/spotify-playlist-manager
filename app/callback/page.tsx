@@ -8,6 +8,8 @@ function CallbackContent() {
     const router = useRouter();
     const [status, setStatus] = useState('Processing...');
 
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://spotify-playlist-manager-backend-atej.onrender.com';
+
     useEffect(() => {
         const code = searchParams.get('code');
         const state = searchParams.get('state');
@@ -26,7 +28,7 @@ function CallbackContent() {
         // Exchange code for access token
         const exchangeCodeForToken = async () => {
             try {
-                const response = await fetch('https://spotify-playlist-manager-backend-atej.onrender.com/callback', {
+                const response = await fetch(`${backendUrl}/callback`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

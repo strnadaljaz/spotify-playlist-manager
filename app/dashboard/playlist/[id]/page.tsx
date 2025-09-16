@@ -17,6 +17,8 @@ export default function PlaylistDetail() {
     const params = useParams();
     const playlist_id = params.id as string;
 
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://spotify-playlist-manager-backend-atej.onrender.com';
+
     useEffect(() => {
         if (typeof window !== 'undefined') {
             const spotify_id = localStorage.getItem('spotify_id');
@@ -30,7 +32,7 @@ export default function PlaylistDetail() {
             const getTracks = async () => {
 
                 try {
-                    const response = await fetch("https://spotify-playlist-manager-backend-atej.onrender.com/getTracks", {
+                    const response = await fetch(`${backendUrl}/getTracks`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -64,7 +66,7 @@ export default function PlaylistDetail() {
         const tracksToRemove = { 'tracks': [{'uri': `spotify:track:${track_id}`}] };
 
         try {
-            const response = await fetch("https://spotify-playlist-manager-backend-atej.onrender.com/removeTrack", {
+            const response = await fetch(`${backendUrl}/removeTrack`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -113,7 +115,7 @@ export default function PlaylistDetail() {
         }
         
         try {
-            const response = await fetch('https://spotify-playlist-manager-backend-atej.onrender.com/search', {
+            const response = await fetch(`${backendUrl}/search`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -156,7 +158,7 @@ export default function PlaylistDetail() {
         }
 
         try {
-            const response = await fetch("https://spotify-playlist-manager-backend-atej.onrender.com/addTrack", {
+            const response = await fetch(`${backendUrl}/addTrack`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

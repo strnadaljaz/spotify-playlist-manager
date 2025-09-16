@@ -5,9 +5,11 @@
 export default function Home() {
   // const router = useRouter();
 
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "https://spotify-playlist-manager-backend-atej.onrender.com";
+
   const handleLoginClick = async () => {
     try {
-      const response = await fetch('https://spotify-playlist-manager-backend-atej.onrender.com/getAuthorizationUrl', {
+      const response = await fetch(`${backendUrl}/getAuthorizationUrl`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
