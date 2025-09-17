@@ -110,6 +110,12 @@ export default function Dashboard() {
         router.push(`/dashboard/playlist/${playlistId}`);
     }
 
+    function logoutUser() {
+        localStorage.removeItem('spotify_id');
+        router.push("/");
+        return;
+    }
+
     if (!playlistsData) {
         return (
           <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white flex items-center justify-center">
@@ -124,7 +130,10 @@ export default function Dashboard() {
     return (
         <div className="min-h-screen bg-black p-8">
             <div className="max-w-6xl mx-auto">
-                <h1 className="text-white text-4xl font-bold mb-8">Dashboard</h1>
+                <div className="flex justify-between items-center">
+                    <h1 className="text-white text-4xl font-bold mb-8">Dashboard</h1>
+                    <button className="text-white px-4 py-2 rounded-lg transition-colors duration-200 cursor-pointer mb-8" onClick={logoutUser}>Logout</button>
+                </div>
                 {userInfo && (
                     <div className="bg-gray-800 p-6 rounded-lg mb-8">
                         <h2 className="text-white text-xl mb-4">Welcome, {userInfo.display_name}</h2>
