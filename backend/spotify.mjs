@@ -1,6 +1,5 @@
 import dotenv from 'dotenv';
 import { writeData } from './database.mjs';
-import { access } from 'fs';
 dotenv.config();
 
 const clientId = process.env.CLIENT_ID;

@@ -10,6 +10,7 @@ export default function PlaylistDetail() {
     const [tracks, setTracks] = useState<Tracks | null>(null);
     const [searchText, setSearchText] = useState<string>('');
     const [searchResults, setSearchResults] = useState<SpotifyTrack[]>([]);
+    const [fullPlaylistDuration, setFullPlaylistDuration] = useState<string>('');
     const router = useRouter();
     
     const [userId, setUserId] = useState<string | null>(null);
@@ -96,17 +97,28 @@ export default function PlaylistDetail() {
         }
     }
 
-    // For debugging
-    // useEffect(() => {
-    //     //console.log(tracks);
-    //     console.log("playlist: ", playlist);
-    // }, [tracks]);
-
     const formatDuration = (ms: number) => {
         const minutes = Math.floor(ms / 60000);
         const seconds = Math.floor((ms % 60000) / 1000);
         return `${minutes}:${seconds.toString().padStart(2, '0')}`;
     };
+
+    const calculateFullPlaylistDuration = () => {
+        if (!tracks) return;
+        let sum = 0
+        for (const item of tracks.items) {
+            sum+=item.track.duration_ms;
+        }
+
+        const hours = Math.floor(sum / 3600000);
+        const minutes = Math.floor((sum%3600000) / 60000);
+
+        setFullPlaylistDuration(`${hours}h ${minutes}min`);
+    }
+
+    useEffect(() => {
+        calculateFullPlaylistDuration();
+    }, [tracks]);
 
     const search = useCallback(async (search_text: string) => {
         if (!search_text || !userId) {
@@ -209,23 +221,27 @@ export default function PlaylistDetail() {
                 >
                     ← Back to Playlists
                 </button>
-                <div className="flex items-center space-x-6">
-                    <div className="w-48 h-48 bg-gray-700 rounded-lg shadow-2xl flex items-center justify-center">
-                        <div className="text-6xl">
-                            <Image 
-                                src={playlist.images[0].url} 
-                                alt={`${playlist.name} playlist cover`}
-                                width={192}
-                                height={192}
-                                className="rounded-lg"
-                            />
-                        </div>
+                <div className="flex flex-col sm:flex-row items-center sm:items-start sm:space-x-6 space-y-6 sm:space-y-0">
+                    {/* Image on top for mobile, left for desktop */}
+                    <div className="bg-gray-700 rounded-lg shadow-2xl flex items-center justify-center">
+                        <Image 
+                            src={playlist.images[0].url} 
+                            alt={`${playlist.name} playlist cover`}
+                            width={192}
+                            height={192}
+                            className="rounded-lg"
+                        />
                     </div>
-                    <div>
+                    {/* Info below image on mobile, right of image on desktop */}
+                    <div className="flex-1 w-full">
                         <p className="text-sm uppercase tracking-wide text-gray-300 mb-2">Playlist</p>
                         <h1 className="text-5xl font-bold mb-4">{playlist.name}</h1>
                         <h2>{playlist.description}</h2>
                         <p className="text-gray-300">{tracks.total} songs</p>
+                    </div>
+                    <div className="ml-0 sm:ml-auto flex flex-col items-end justify-end w-full sm:w-auto">
+                        <span className="text-xs text-gray-400 uppercase tracking-wider mb-1">Total duration</span>
+                        <span className="text-lg font-medium text-gray-200">{fullPlaylistDuration}</span>
                     </div>
                 </div>
             </div>
