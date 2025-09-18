@@ -10,7 +10,6 @@ export default function PlaylistDetail() {
     const [tracks, setTracks] = useState<Tracks | null>(null);
     const [searchText, setSearchText] = useState<string>('');
     const [searchResults, setSearchResults] = useState<SpotifyTrack[]>([]);
-    const [fullPlaylistDuration, setFullPlaylistDuration] = useState<string>('');
     const router = useRouter();
     
     const [userId, setUserId] = useState<string | null>(null);
@@ -102,23 +101,6 @@ export default function PlaylistDetail() {
         const seconds = Math.floor((ms % 60000) / 1000);
         return `${minutes}:${seconds.toString().padStart(2, '0')}`;
     };
-
-    const calculateFullPlaylistDuration = () => {
-        if (!tracks) return;
-        let sum = 0
-        for (const item of tracks.items) {
-            sum+=item.track.duration_ms;
-        }
-
-        const hours = Math.floor(sum / 3600000);
-        const minutes = Math.floor((sum%3600000) / 60000);
-
-        setFullPlaylistDuration(`${hours}h ${minutes}min`);
-    }
-
-    useEffect(() => {
-        calculateFullPlaylistDuration();
-    }, [tracks]);
 
     const search = useCallback(async (search_text: string) => {
         if (!search_text || !userId) {
@@ -239,9 +221,12 @@ export default function PlaylistDetail() {
                         <h2>{playlist.description}</h2>
                         <p className="text-gray-300">{tracks.total} songs</p>
                     </div>
-                    <div className="ml-0 sm:ml-auto flex flex-col items-end justify-end w-full sm:w-auto">
-                        <span className="text-xs text-gray-400 uppercase tracking-wider mb-1">Total duration</span>
-                        <span className="text-lg font-medium text-gray-200">{fullPlaylistDuration}</span>
+                    <div className="flex flex-col items-center sm:items-end justify-start space-y-2 sm:mt-8">
+                        <button className="bg-transparent hover:bg-gray-800 text-white font-semibold hover:text-white py-3 px-6 border-2 border-gray-600 hover:border-gray-500 rounded-xl cursor-pointer transition-all duration-200 ease-in-out transform hover:scale-105 shadow-lg hover:shadow-xl" onClick={()=>
+                            router.push(`${playlist_id}/analytics`)
+                        }>
+                            Analytics
+                        </button>
                     </div>
                 </div>
             </div>
