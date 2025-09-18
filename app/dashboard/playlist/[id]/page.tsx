@@ -75,7 +75,7 @@ export default function PlaylistDetail() {
                 body: JSON.stringify ({
                     playlist_id: playlist_id,
                     tracks: tracksToRemove,
-                    user_id: userId
+                    spotify_id: userId
                 })
             });
 

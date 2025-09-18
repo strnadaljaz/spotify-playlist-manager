@@ -56,7 +56,7 @@ export async function getPlaylistsData(user_id, access_token) {
     return data;
 }
 
-export async function checkAccessToken(access_token, refresh_token, expires, spotify_id) {
+export async function validateAccessToken(access_token, refresh_token, expires, spotify_id) {
     if (!(Date.now() + 120000 < expires)) {
         const newData = await getNewTokens(refresh_token, clientId);
         access_token = newData.access_token;
