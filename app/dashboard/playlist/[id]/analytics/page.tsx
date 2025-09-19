@@ -156,62 +156,84 @@ export default function AnalyzePage() {
             getPieData();
         }
     }, [artists]);
-    
-    useEffect(() => {
-        if (!years) return;
-        else console.log(years);
-    }, [years]);
 
     const uData = years ? Object.values(years) : [];
     const xLabels = years ? Object.keys(years) : [];
 
-    return (
-        <div className="h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-black">
-            <div>
-                <Box sx={{ width: '100%', height: 300 }}>
-                    <BarChart
-                        series={[
-                        { data: uData, label: 'uv', id: 'uvId' },
-                        ]}
-                        xAxis={[{ data: xLabels }]}
-                        yAxis={[{ width: 50 }]}
-                    />
-                </Box>
+    if (!artists || !pieData || !numberOfTracks || !totalDuration || !years) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white flex items-center justify-center">
+            <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
+                <p className="text-gray-300">Loading analytics...</p>
             </div>
-            
-            <div>
-                {totalDuration && (
-                    <p>Total duration: {totalDuration}</p>
-                )}
-            </div>
+          </div>  
+        );
+    }
 
-            <div>
-                {numberOfTracks && (
-                    <p>Total number of tracks: {numberOfTracks}</p>
-                )}
-            </div>
-            
-            <div className="bg-gray-800 shadow-lg rounded-lg p-6 w-1/2 h-1/2 flex items-center justify-center overflow-hidden"> 
-                {pieData.length > 0 ? (
-                    <PieChart
-                        series={[
-                            {
-                                data: pieData,
-                                innerRadius: 25,
-                                outerRadius: 90,
-                                paddingAngle: 2,
-                                cornerRadius: 8,
-                                startAngle: 0,
-                                endAngle: 360,
-                                cx: 150,
-                                cy: 90, 
+    return (
+        <div className="min-h-screen w-full bg-gradient-to-br from-gray-900 to-black flex flex-col items-center justify-center p-8 gap-8">
+            <div className="w-full max-w-4xl flex flex-col md:flex-row gap-8">
+                <div className="flex-1 bg-[#18181b] rounded-xl shadow-2xl p-6 flex flex-col items-center border border-gray-800">
+                    <h2 className="text-xl font-bold text-white mb-4 tracking-tight">Tracks by Year</h2>
+                    <Box sx={{ width: '100%', height: 300 }}>
+                        <BarChart
+                            series={[
+                                { data: uData,  id: 'uId', color: '#22c55e' }, // green-500
+                            ]}
+                            xAxis={[{ data: xLabels, tickLabelStyle: { fill: '#a3a3a3' } }]}
+                            yAxis={[{ width: 50, tickLabelStyle: { fill: '#a3a3a3' } }]}
+                        />
+                    </Box>
+                </div>
+                <div className="flex-1 bg-[#18181b] rounded-xl shadow-2xl p-6 flex flex-col items-center justify-center border border-gray-800">
+                    <h2 className="text-xl font-bold text-white mb-4 tracking-tight">Top Artists</h2>
+                    <div className="w-full h-72 flex items-center justify-center">
+                        {pieData.length > 0 ? (
+                            <PieChart
+                                series={[
+                                    {
+                                        data: pieData.map((item, idx) => ({
+                                            ...item,
+                                            color: [
+                                                '#eab308',
+                                                '#3b82f6', 
+                                                '#f59e42', 
+                                                '#f43f5e', 
+                                                '#a21caf', 
+                                                '#22c55e', 
+                                            ][idx % 10],
+                                        stroke: '#18181b',
+                                        strokeWidth:2,
+                                        })),
+                                        innerRadius: 25,
+                                        outerRadius: 90,
+                                        paddingAngle: 2,
+                                        cornerRadius: 8,
+                                        startAngle: 0,
+                                        endAngle: 360,
+                                        cx: 100,
+                                        cy: 90,
+                                        // You can add a green color palette here if you want
                             }
                         ]}
-                        style={{ width: '100%', height: '100%' }} 
+                        style={{ width: '100%', height: '100%' }}
                     />
                 ) : (
-                    <p className="text-gray-400 text-center">Loading data...</p> 
+                    <p className="text-gray-400 text-center">Loading data...</p>
                 )}
+                    </div>
+                </div>
+            </div>
+            <div className="w-full max-w-4xl flex flex-col md:flex-row gap-4 mt-8">
+                <div className="flex-1 bg-[#18181b] rounded-xl shadow-2xl p-6 flex flex-col items-center border border-gray-800">
+                    <span className="text-gray-400">Total duration</span>
+                    <span className="text-2xl text-white font-bold">{totalDuration || '—'}</span>
+                </div>
+                <div className="flex-1 bg-[#18181b] rounded-xl shadow-2xl p-6 flex flex-col items-center border border-gray-800">
+                    <span className="text-gray-400">Total number of tracks</span>
+                    <span className="text-2xl text-white font-bold">{numberOfTracks || '—'}</span>
+                </div>
             </div>
         </div>
     );
