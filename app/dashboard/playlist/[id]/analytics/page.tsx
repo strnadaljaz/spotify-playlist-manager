@@ -3,6 +3,7 @@
 import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { PieChart } from '@mui/x-charts/PieChart';
+import { SpotifyPlaylistItem } from '../../../defines';
 
 export default function AnalyzePage() {
     const [artists, setArtists] = useState<{ [key: string]: number } | null>(null);
@@ -115,7 +116,7 @@ export default function AnalyzePage() {
         setPieData(all_data);
     }
 
-    function calculateFullPlaylistDuration(items: any) {
+    function calculateFullPlaylistDuration(items: SpotifyPlaylistItem[]) {
         let ms = 0
         for (const item of items) {
             ms += item.track.duration_ms;

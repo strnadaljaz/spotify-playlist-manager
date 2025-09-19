@@ -69,3 +69,14 @@ export interface SpotifyTrack {
     };
     duration_ms: number;
 }
+
+export interface SpotifyArtist {
+    name: string;
+    id: string;
+    // Add other artist properties as needed
+}
+
+export interface SpotifyPlaylistItem {
+    track: SpotifyTrack;
+    // Add other item properties as needed
+}
