@@ -3,6 +3,7 @@ import { writeData } from './database.mjs';
 dotenv.config();
 
 const clientId = process.env.CLIENT_ID;
+const clientSecret = process.env.CLIENT_SECRET;
 
 export async function getProfile(access_token) {
     let accessToken = access_token;
@@ -18,13 +19,14 @@ export async function getProfile(access_token) {
     return data;
 }
 
-export async function getNewTokens(refreshToken, clientId) {
+export async function getNewTokens(refreshToken, clientId, clientSecret) {
     const url = "https://accounts.spotify.com/api/token";
 
     const payload = {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': 'Basic ' + Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
       },
       body: new URLSearchParams({
         grant_type: 'refresh_token',
@@ -58,9 +60,11 @@ export async function getPlaylistsData(user_id, access_token) {
 
 export async function validateAccessToken(access_token, refresh_token, expires, spotify_id) {
     if (!(Date.now() + 120000 < expires)) {
-        const newData = await getNewTokens(refresh_token, clientId);
+        const newData = await getNewTokens(refresh_token, clientId, clientSecret);
         access_token = newData.access_token;
-        refresh_token = newData.refresh_token;
+        if (newData.refreshToken) {
+            refresh_token = newData.refreshToken;
+        }
         const expires_in = newData.expires_in;
         const now = Date.now();
         expires = new Date(now + expires_in * 1000);
