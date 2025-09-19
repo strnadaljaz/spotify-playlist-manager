@@ -173,6 +173,12 @@ export default function AnalyzePage() {
 
     return (
         <div className="min-h-screen w-full bg-gradient-to-br from-gray-900 to-black flex flex-col items-center justify-center p-8 gap-8">
+            <button 
+                    onClick={() => router.back()}
+                    className="mb-4 text-gray-300 hover:text-white transition-colors cursor-pointer"
+                >
+                    ← Back to Playlist
+                </button>
             <div className="w-full max-w-4xl flex flex-col md:flex-row gap-8">
                 <div className="flex-1 bg-[#18181b] rounded-xl shadow-2xl p-6 flex flex-col items-center border border-gray-800">
                     <h2 className="text-xl font-bold text-white mb-4 tracking-tight">Tracks by Year</h2>
