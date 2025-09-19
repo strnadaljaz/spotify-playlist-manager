@@ -105,7 +105,7 @@ export default function AnalyzePage() {
     function getPieData() {
         if (!artists) return;
         
-        let all_data = [];
+        const all_data = [];
         let i = 0;
         for (const [key, value] of Object.entries(artists)) {
             const one_data = { id: i, value: value, label: key};
