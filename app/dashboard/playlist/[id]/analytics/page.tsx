@@ -4,6 +4,8 @@ import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { PieChart } from '@mui/x-charts/PieChart';
 import { SpotifyPlaylistItem } from '../../../defines';
+import Box from '@mui/material/Box';
+import { BarChart } from '@mui/x-charts/BarChart';
 
 export default function AnalyzePage() {
     const [artists, setArtists] = useState<{ [key: string]: number } | null>(null);
@@ -11,6 +13,7 @@ export default function AnalyzePage() {
     const [pieData, setPieData] = useState<{ id: number, value: number, label: string}[]>([]);
     const [numberOfTracks, setNumberOfTracks] = useState<number | null>(null);
     const [totalDuration, setTotalDuration] = useState<string | null>(null);
+    const [years, setYears] = useState<{ [key: string]: number } | null>(null);
 
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://spotify-playlist-manager-backend-atej.onrender.com';
 
@@ -59,22 +62,29 @@ export default function AnalyzePage() {
             const items = track_data.tracks.tracks.items;
 
             const artists_count: { [key: string]: number} = {};
+            const years_count: { [key:string]: number} = {};
             calculateFullPlaylistDuration(items);
             let tracks_count = 0;
 
             for (const item of items) {
-                const artists = item.track.artists
+                const artists = item.track.artists;
+                const date = item.track.album.release_date;
+                const year = date.substring(0, 4); // First 4 chars are release year
                 for (const artist of artists) {
                     if (!artists_count[artist.name]){
                         artists_count[artist.name] = 0;
                     }
-                    artists_count[artist.name] += 1;
+                    artists_count[artist.name]++;
                 }
+                if (!years_count[year]) {
+                    years_count[year] = 0;
+                }
+                years_count[year]++;
                 tracks_count++;
             }
-
-            setNumberOfTracks(tracks_count);
             
+            setNumberOfTracks(tracks_count);
+
             const sorted_artists_count = Object.fromEntries(
                 Object.entries(artists_count).sort(([,a],[,b]) => b - a)
             );
@@ -84,7 +94,7 @@ export default function AnalyzePage() {
             );
 
             const other_artists = Object.fromEntries(
-                Object.entries(sorted_artists_count).slice(5, -1)
+                Object.entries(sorted_artists_count).slice(5)
             );
 
             let other_artists_count = 0
@@ -95,7 +105,8 @@ export default function AnalyzePage() {
 
             top_five_artists['Other'] = other_artists_count;
 
-            return top_five_artists;
+            setArtists(top_five_artists);
+            setYears(years_count);
         } catch (error) {
             console.error('Error getting tracks: ', error);
             return;
@@ -134,10 +145,7 @@ export default function AnalyzePage() {
         if (!spotifyId || !playlist_id) return;
 
         const fetchData = async () => {
-            const data = await getData(playlist_id, spotifyId);
-            if (data) {
-                setArtists(data);
-            }
+            await getData(playlist_id, spotifyId);
         } 
 
         fetchData();
@@ -149,8 +157,28 @@ export default function AnalyzePage() {
         }
     }, [artists]);
     
+    useEffect(() => {
+        if (!years) return;
+        else console.log(years);
+    }, [years]);
+
+    const uData = years ? Object.values(years) : [];
+    const xLabels = years ? Object.keys(years) : [];
+
     return (
         <div className="h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-black">
+            <div>
+                <Box sx={{ width: '100%', height: 300 }}>
+                    <BarChart
+                        series={[
+                        { data: uData, label: 'uv', id: 'uvId' },
+                        ]}
+                        xAxis={[{ data: xLabels }]}
+                        yAxis={[{ width: 50 }]}
+                    />
+                </Box>
+            </div>
+            
             <div>
                 {totalDuration && (
                     <p>Total duration: {totalDuration}</p>
