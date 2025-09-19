@@ -8,7 +8,9 @@ export default function AnalyzePage() {
     const [artists, setArtists] = useState<{ [key: string]: number } | null>(null);
     const [spotifyId, setSpotifyId] = useState<string | null>(null);
     const [pieData, setPieData] = useState<{ id: number, value: number, label: string}[]>([]);
-    
+    const [numberOfTracks, setNumberOfTracks] = useState<number | null>(null);
+    const [totalDuration, setTotalDuration] = useState<string | null>(null);
+
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://spotify-playlist-manager-backend-atej.onrender.com';
 
     const router = useRouter();
@@ -27,7 +29,7 @@ export default function AnalyzePage() {
         setSpotifyId(spotify_id);
     }, [router, playlist_id]);
 
-    async function getArtists (playlist_id: string, spotify_id: string) {
+    async function getData (playlist_id: string, spotify_id: string) {
         if (!playlist_id) {
             console.error('No playlist id');
             return;
@@ -56,6 +58,8 @@ export default function AnalyzePage() {
             const items = track_data.tracks.tracks.items;
 
             const artists_count: { [key: string]: number} = {};
+            calculateFullPlaylistDuration(items);
+            let tracks_count = 0;
 
             for (const item of items) {
                 const artists = item.track.artists
@@ -65,7 +69,10 @@ export default function AnalyzePage() {
                     }
                     artists_count[artist.name] += 1;
                 }
+                tracks_count++;
             }
+
+            setNumberOfTracks(tracks_count);
             
             const sorted_artists_count = Object.fromEntries(
                 Object.entries(artists_count).sort(([,a],[,b]) => b - a)
@@ -108,11 +115,25 @@ export default function AnalyzePage() {
         setPieData(all_data);
     }
 
+    function calculateFullPlaylistDuration(items: any) {
+        let ms = 0
+        for (const item of items) {
+            ms += item.track.duration_ms;
+        }
+
+        const hours = Math.floor(ms / 3600000);
+        const minutes = Math.floor((ms % 3600000) / 60000);
+
+        setTotalDuration(`${hours}h ${minutes}min`);
+        
+        return;
+    }
+
     useEffect(() => {
         if (!spotifyId || !playlist_id) return;
 
         const fetchData = async () => {
-            const data = await getArtists(playlist_id, spotifyId);
+            const data = await getData(playlist_id, spotifyId);
             if (data) {
                 setArtists(data);
             }
@@ -129,7 +150,19 @@ export default function AnalyzePage() {
     
     return (
         <div className="h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-black">
-            <div className="bg-gray-800 shadow-lg rounded-lg p-6 w-1/2 h-1/2 flex items-center justify-center overflow-hidden"> {/* Adjusted background color */}
+            <div>
+                {totalDuration && (
+                    <p>Total duration: {totalDuration}</p>
+                )}
+            </div>
+
+            <div>
+                {numberOfTracks && (
+                    <p>Total number of tracks: {numberOfTracks}</p>
+                )}
+            </div>
+            
+            <div className="bg-gray-800 shadow-lg rounded-lg p-6 w-1/2 h-1/2 flex items-center justify-center overflow-hidden"> 
                 {pieData.length > 0 ? (
                     <PieChart
                         series={[
@@ -142,10 +175,10 @@ export default function AnalyzePage() {
                                 startAngle: 0,
                                 endAngle: 360,
                                 cx: 150,
-                                cy: 90, // Centered based on the new dimensions
+                                cy: 90, 
                             }
                         ]}
-                        style={{ width: '100%', height: '100%' }} // Set explicit width and height
+                        style={{ width: '100%', height: '100%' }} 
                     />
                 ) : (
                     <p className="text-gray-400 text-center">Loading data...</p> 
