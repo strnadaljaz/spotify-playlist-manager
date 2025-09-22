@@ -218,13 +218,21 @@ export default function AnalyzePage() {
                                         cornerRadius: 8,
                                         startAngle: 0,
                                         endAngle: 360,
-                                        cx: 100,
-                                        cy: 90,
-                                        // You can add a green color palette here if you want
-                            }
-                        ]}
-                        style={{ width: '100%', height: '100%' }}
-                    />
+                                        cx: '50%',
+                                        cy: '50%',
+                                    }
+                                ]}
+                                slotProps={{
+                                    legend: {
+                                        direction: 'horizontal',
+                                        position: {
+                                            vertical: 'middle',
+                                            horizontal: 'center'
+                                        }
+                                    }
+                                }}
+                                style={{ width: '100%', height: '100%' }}
+                            />
                 ) : (
                     <p className="text-gray-400 text-center">Loading data...</p>
                 )}
