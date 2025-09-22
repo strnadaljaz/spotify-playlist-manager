@@ -10,7 +10,11 @@
 
 <!-- Add screenshots/GIF here -->
 ## 📸 Screenshots & Demo
-*Coming soon - screenshots and demo GIF will be added here*
+
+### 🎥 Live Demo
+![Spotify Playlist Manager Demo](docs/demo/app-demo.gif)
+
+*Watch the app in action: OAuth login, playlist browsing, and responsive design*
 
 ## 📋 Project Description
 
