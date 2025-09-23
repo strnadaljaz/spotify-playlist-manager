@@ -101,4 +101,23 @@ test("If fetch throws an error, an error is logged", async () => {
 
   fetchMock.mockRestore();
   consoleErrorMock.mockRestore();
-}); 
+});
+
+test("The backend URL uses the environment variable if set, otherwise falls back to the default URL", () => {
+  const originalEnv = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+  process.env.NEXT_PUBLIC_BACKEND_URL = "https://custom-backend-url.com";
+  const customBackendUrl =
+    process.env.NEXT_PUBLIC_BACKEND_URL ||
+    "https://spotify-playlist-manager-backend-atej.onrender.com";
+  expect(customBackendUrl).toBe("https://custom-backend-url.com");
+
+  delete process.env.NEXT_PUBLIC_BACKEND_URL;
+  const fallbackBackendUrl =
+    process.env.NEXT_PUBLIC_BACKEND_URL ||
+    "https://spotify-playlist-manager-backend-atej.onrender.com";
+  expect(fallbackBackendUrl).toBe("https://spotify-playlist-manager-backend-atej.onrender.com");
+
+ 
+  process.env.NEXT_PUBLIC_BACKEND_URL = originalEnv;
+})
