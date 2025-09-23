@@ -152,7 +152,49 @@ npm run dev
 
 Visit `http://localhost:3000` to see the application running.
 
-## 🧠 What I Learned & Challenges Solved
+## � Testing
+
+
+This project uses **Jest** and **React Testing Library** for unit and integration testing of the frontend. Backend tests can be added as needed.
+
+> **Note:** You must create your own `babel.config.js` file before running tests. This file is not included in the repository (to avoid Vercel deployment issues). Without it, tests will not work. See the example below:
+
+```js
+// babel.config.js
+module.exports = {
+  presets: [
+    '@babel/preset-env',
+    '@babel/preset-react',
+    '@babel/preset-typescript',
+  ],
+};
+```
+
+### Running Tests
+
+To run all tests:
+
+```bash
+npm test
+```
+
+Or, for more detailed output:
+
+```bash
+npm run test:watch
+```
+
+- Frontend tests are located in the `__tests__/frontend/` directory and cover React components and pages.
+- Test files use the `.test.tsx` or `.test.ts` naming convention.
+- You can run tests for a specific file by passing its path to the test command.
+
+### Adding Tests
+
+- Place new test files in the appropriate `__tests__` subdirectory.
+- Use [Jest](https://jestjs.io/) and [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/) best practices for writing tests.
+- Ensure your code is covered by tests before submitting a pull request.
+
+## �🧠 What I Learned & Challenges Solved
 
 ### Key Learning Points
 
