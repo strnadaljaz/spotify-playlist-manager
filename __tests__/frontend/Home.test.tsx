@@ -64,3 +64,25 @@ test("On successful fetch, the app sets window.location.href to the returned a
 
   (window as any).location.href = originalHref;
 });
+
+test("If the fetch response is not OK, an error is logged", async () => {
+  const fetchMock = jest.spyOn(globalThis, "fetch").mockResolvedValue({
+    ok: false,
+    status: 500,
+    statusText: "Internal Server Error",
+    json: async () => ({}),
+  } as Response);
+
+  const consoleErrorMock = jest.spyOn(console, "error").mockImplementation(() => {});
+
+  render(<Home />);
+  const button = screen.getByText("Login with Spotify");
+  fireEvent.click(button);
+
+  await waitFor(() => {
+    expect(consoleErrorMock).toHaveBeenCalled();
+  });
+
+  fetchMock.mockRestore();
+  consoleErrorMock.mockRestore();
+});
