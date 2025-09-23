@@ -47,3 +47,30 @@ test("On mount, it sends the code to your backend to exchange for tokens", async
 
   fetchMock.mockRestore();
 });
+
+test("It handles fetch success and failure (e.g., displays a message or redirects)", async () => {
+  // Success case
+  const fetchMock = jest.spyOn(globalThis, "fetch").mockResolvedValue({
+    ok: true,
+    json: async () => ({ access_token: "ACCESS_TOKEN" }),
+  } as Response);
+
+  render(<Callback />);
+  expect(await screen.findByText(/Spotify Authentication/)).toBeInTheDocument();
+  // You may want to check for a success message or redirect logic here
+
+  fetchMock.mockRestore();
+
+  // Failure case
+  const fetchMockFail = jest.spyOn(globalThis, "fetch").mockResolvedValue({
+    ok: false,
+    status: 400,
+    statusText: "Bad Request",
+    json: async () => ({}),
+  } as Response);
+
+  render(<Callback />);
+  expect(await screen.findByText(/Authentication successful! Redirecting.../)).toBeInTheDocument();
+
+  fetchMockFail.mockRestore();
+});
