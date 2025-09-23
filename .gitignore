@@ -17,6 +17,8 @@
 /.next/
 /out/
 
+babel.config.js
+
 # production
 /build
 
