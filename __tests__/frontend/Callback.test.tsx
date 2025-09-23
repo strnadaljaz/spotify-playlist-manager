@@ -95,3 +95,12 @@ test("Shows a loading indicator while waiting for the backend", async () => {
 
   fetchMock.mockRestore();
 });
+
+test("Displays an error message if something goes wrong", async () => {
+  const fetchMock = jest.spyOn(globalThis, "fetch").mockRejectedValue(new Error("Network error"));
+
+  render(<Callback />);
+  expect(await screen.findByText(/An error occurred during authentication/)).toBeInTheDocument();
+
+  fetchMock.mockRestore();
+});
