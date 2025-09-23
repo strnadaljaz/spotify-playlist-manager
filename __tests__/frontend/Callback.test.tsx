@@ -74,3 +74,24 @@ test("It handles fetch success and failure (e.g., displays a message or redirect
 
   fetchMockFail.mockRestore();
 });
+
+test("Shows a loading indicator while waiting for the backend", async () => {
+  // Simulate a slow fetch response
+  const fetchMock = jest.spyOn(globalThis, "fetch").mockImplementation(() =>
+    new Promise(resolve =>
+      setTimeout(() => resolve({
+        ok: true,
+        json: async () => ({ access_token: "ACCESS_TOKEN" }),
+      } as Response), 100)
+    )
+  );
+
+  render(<Callback />);
+  // The loading indicator should be visible while waiting
+  expect(screen.getByText(/Processing.../)).toBeInTheDocument();
+
+  // Wait for fetch to resolve and UI to update
+  await screen.findByText(/Spotify Authentication/);
+
+  fetchMock.mockRestore();
+});
