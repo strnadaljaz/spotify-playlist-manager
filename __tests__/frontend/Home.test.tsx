@@ -42,3 +42,25 @@ test("Clicking the button triggers a fetch call to the correct backend URL with 
 
   fetchMock.mockRestore();
 });
+
+test("On successful fetch, the app sets window.location.href to the returned authorization URL", async () => {
+  const fakeUrl = "http://localhost/";
+  jest.spyOn(globalThis, "fetch").mockResolvedValue({
+    ok: true,
+    json: async () => fakeUrl,
+  } as Response);
+
+  const originalHref = window.location.href;
+  delete (window as any).location;
+  (window as any).location = { href: "" };
+
+  render(<Home />);
+  const button = screen.getByText("Login with Spotify");
+  fireEvent.click(button);
+
+  await waitFor(() => {
+    expect(window.location.href).toBe(fakeUrl);
+  });
+
+  (window as any).location.href = originalHref;
+});
