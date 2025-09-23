@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import React from 'react';
 
 function CallbackContent() {
     const searchParams = useSearchParams();
