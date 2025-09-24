@@ -5,15 +5,18 @@ import { useRouter, useParams } from "next/navigation";
 import { SpotifyPlaylist, Tracks, SpotifyTrack } from "../../defines";
 import Image from "next/image";
 import Loader from "@/app/components/Loader";
+import { useSpotify } from "@/app/hooks/useSpotify";
 
 export default function PlaylistDetail() {
-    const [playlist, setPlaylist] = useState<SpotifyPlaylist | null>(null);
-    const [tracks, setTracks] = useState<Tracks | null>(null);
-    const [searchText, setSearchText] = useState<string>('');
-    const [searchResults, setSearchResults] = useState<SpotifyTrack[]>([]);
-    const router = useRouter();
-    
-    const [userId, setUserId] = useState<string | null>(null);
+    const {
+        playlist, setPlaylist,
+        tracks, setTracks,
+        searchText, setSearchText,
+        searchResults, setSearchResults,
+        userId, setUserId
+    } = useSpotify();
+
+    const router = useRouter();  
 
     const params = useParams();
     const playlist_id = params.id as string;

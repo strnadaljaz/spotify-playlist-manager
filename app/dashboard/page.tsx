@@ -6,11 +6,15 @@ import { useRouter } from "next/navigation";
 import { SpotifyPlaylist, SpotifyUserInfo } from "./defines";
 import Image from "next/image";
 import Loader from "@/app/components/Loader";
+import { useSpotify } from "@/app/hooks/useSpotify";
 
 export default function Dashboard() {
-    const [userInfo, setUserInfo] = useState<SpotifyUserInfo | null>(null);
-    const [token, setToken] = useState(null);
-    const [playlistsData, setPlaylistsData] = useState<SpotifyPlaylist[] | null>(null);
+    const {
+        userInfo, setUserInfo,
+        token, setToken,
+        playlistsData, setPlaylistsData,
+    } = useSpotify();
+    
     const router = useRouter();
 
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://spotify-playlist-manager-backend-atej.onrender.com';

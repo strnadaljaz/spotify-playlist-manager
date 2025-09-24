@@ -7,31 +7,35 @@ import { SpotifyPlaylistItem } from '../../../defines';
 import Box from '@mui/material/Box';
 import { BarChart } from '@mui/x-charts/BarChart';
 import Loader from "@/app/components/Loader";
+import { useSpotify } from "@/app/hooks/useSpotify";
 
 export default function AnalyzePage() {
-    const [artists, setArtists] = useState<{ [key: string]: number } | null>(null);
-    const [spotifyId, setSpotifyId] = useState<string | null>(null);
-    const [pieData, setPieData] = useState<{ id: number, value: number, label: string}[]>([]);
-    const [numberOfTracks, setNumberOfTracks] = useState<number | null>(null);
-    const [totalDuration, setTotalDuration] = useState<string | null>(null);
-    const [years, setYears] = useState<{ [key: string]: number } | null>(null);
+    const {
+        artists, setArtists,
+        userId, setUserId,
+        pieData, setPieData,
+        numberOfTracks, setNumberOfTracks,
+        totalDuration, setTotalDuration,
+        years, setYears
+    } = useSpotify();
+
+    const router = useRouter();
 
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://spotify-playlist-manager-backend-atej.onrender.com';
 
-    const router = useRouter();
     const params = useParams();
 
     const playlist_id = params.id as string;
 
     useEffect(() => {
-        const spotify_id = localStorage.getItem('spotify_id');
+        const user_id = localStorage.getItem('spotify_id');
 
-        if (!spotify_id) {
+        if (!user_id) {
             router.push('/');
             return;
         }
 
-        setSpotifyId(spotify_id);
+        setUserId(user_id);
     }, [router, playlist_id]);
 
     async function getData (playlist_id: string, spotify_id: string) {
@@ -143,14 +147,14 @@ export default function AnalyzePage() {
     }
 
     useEffect(() => {
-        if (!spotifyId || !playlist_id) return;
+        if (!userId || !playlist_id) return;
 
         const fetchData = async () => {
-            await getData(playlist_id, spotifyId);
+            await getData(playlist_id, userId);
         } 
 
         fetchData();
-    }, [playlist_id, spotifyId]);
+    }, [playlist_id, userId]);
 
     useEffect(() => {
         if (artists) {
@@ -170,11 +174,11 @@ export default function AnalyzePage() {
     return (
         <div className="min-h-screen w-full bg-gradient-to-br from-gray-900 to-black flex flex-col items-center justify-center p-8 gap-8">
             <button 
-                    onClick={() => router.back()}
-                    className="mb-4 text-gray-300 hover:text-white transition-colors cursor-pointer"
-                >
-                    ← Back to Playlist
-                </button>
+                onClick={() => router.back()}
+                className="mb-4 text-gray-300 hover:text-white transition-colors cursor-pointer"
+            >
+                ← Back to Playlist
+            </button>
             <div className="w-full max-w-4xl flex flex-col md:flex-row gap-8">
                 <div className="flex-1 bg-[#18181b] rounded-xl shadow-2xl p-6 flex flex-col items-center border border-gray-800">
                     <h2 className="text-xl font-bold text-white mb-4 tracking-tight">Tracks by Year</h2>
