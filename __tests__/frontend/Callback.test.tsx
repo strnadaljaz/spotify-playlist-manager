@@ -5,9 +5,12 @@ import Callback from "../../app/callback/page";
 import { useRouter } from "next/navigation";
 import "whatwg-fetch";
 
+// Default mock for most tests
 jest.mock("next/navigation", () => ({
   useRouter: () => ({
     query: { code: "AUTH_CODE", error: undefined },
+    // Add a dummy push so destructuring doesn't break
+    push: jest.fn(),
   }),
   useSearchParams: () => ({
     get: (key: string) => {
@@ -101,6 +104,73 @@ test("Displays an error message if something goes wrong", async () => {
 
   render(<Callback />);
   expect(await screen.findByText(/An error occurred during authentication/)).toBeInTheDocument();
+
+  fetchMock.mockRestore();
+});
+
+test("Redirects or updates UI on success", async () => {
+  // Mock fetch to simulate successful token exchange
+  const fetchMock = jest.spyOn(globalThis, "fetch").mockResolvedValue({
+    ok: true,
+    json: async () => ({
+      access_token: "ACCESS_TOKEN",
+      spotify_id: "SPOTIFY_USER_ID"
+    }),
+  } as Response);
+
+  // Mock router.push to observe redirection
+  const pushMock = jest.fn();
+  jest.spyOn(require("next/navigation"), "useRouter").mockReturnValue({
+    query: { code: "AUTH_CODE", error: undefined },
+    push: pushMock,
+  });
+
+  render(<Callback />);
+  
+  // Wait for success message
+  expect(await screen.findByText(/Authentication successful! Redirecting.../)).toBeInTheDocument();
+
+  // Wait for the redirect to be triggered (after 2s)
+  await new Promise(resolve => setTimeout(resolve, 2100));
+  expect(pushMock).toHaveBeenCalledWith("/dashboard");
+
+  fetchMock.mockRestore();
+});
+
+test("Displays an error if no authorization code is present", async () => {
+  // Override useSearchParams to simulate missing code
+  jest.spyOn(require("next/navigation"), "useSearchParams").mockReturnValue({
+    get: (key: string) => {
+      if (key === "code") return null;
+      if (key === "error") return undefined;
+      return null;
+    },
+  });
+
+  render(<Callback />);
+  expect(await screen.findByText(/No authorization code received/)).toBeInTheDocument();
+});
+
+test("Displays an error if the backend returns an error", async () => {
+  // Ensure useSearchParams returns a valid code
+  jest.spyOn(require("next/navigation"), "useSearchParams").mockReturnValue({
+    get: (key: string) => {
+      if (key === "code") return "AUTH_CODE";
+      if (key === "error") return undefined;
+      return null;
+    },
+  });
+
+  // Mock fetch to simulate backend error response
+  const fetchMock = jest.spyOn(globalThis, "fetch").mockResolvedValue({
+    ok: true,
+    json: async () => ({
+      error: "Invalid code",
+    }),
+  } as Response);
+
+  render(<Callback />);
+  expect(await screen.findByText(/Error: Invalid code/)).toBeInTheDocument();
 
   fetchMock.mockRestore();
 });
