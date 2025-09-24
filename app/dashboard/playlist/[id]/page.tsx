@@ -182,6 +182,10 @@ export default function PlaylistDetail() {
         }
     }
 
+    const handlePlayClick = () => {
+        window.open(`https://open.spotify.com/playlist/${playlist_id}`, '_blank');
+    };
+
     if (!tracks || !playlist) {
         return (
           <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white flex items-center justify-center">
@@ -308,7 +312,7 @@ export default function PlaylistDetail() {
                                     <span className="text-gray-400 text-sm group-hover:hidden">
                                         {index + 1}
                                     </span>
-                                    <button className="hidden group-hover:block text-white hover:text-green-500 cursor-pointer">
+                                    <button className="hidden group-hover:block text-white hover:text-green-500 cursor-pointer" onClick={handlePlayClick}>
                                         ▶
                                     </button>
                                 </div>
