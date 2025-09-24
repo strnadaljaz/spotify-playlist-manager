@@ -6,6 +6,7 @@ import { PieChart } from '@mui/x-charts/PieChart';
 import { SpotifyPlaylistItem } from '../../../defines';
 import Box from '@mui/material/Box';
 import { BarChart } from '@mui/x-charts/BarChart';
+import Loader from "@/app/components/Loader";
 
 export default function AnalyzePage() {
     const [artists, setArtists] = useState<{ [key: string]: number } | null>(null);
@@ -162,12 +163,7 @@ export default function AnalyzePage() {
 
     if (!artists || !pieData || !numberOfTracks || !totalDuration || !years) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white flex items-center justify-center">
-            <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
-                <p className="text-gray-300">Loading analytics...</p>
-            </div>
-          </div>  
+            <Loader message="Loading analytics..." />
         );
     }
 
