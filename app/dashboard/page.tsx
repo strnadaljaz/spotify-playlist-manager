@@ -1,9 +1,8 @@
 "use client";
 
 import React from "react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { SpotifyPlaylist, SpotifyUserInfo } from "./defines";
 import Image from "next/image";
 import Loader from "@/app/components/Loader";
 import { useSpotify } from "@/app/hooks/useSpotify";
@@ -20,7 +19,7 @@ export default function Dashboard() {
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://spotify-playlist-manager-backend-atej.onrender.com';
 
     useEffect(() => {
-        const spotify_id = localStorage.getItem("spotify_id");
+        const spotify_id = localStorage.getItem("user_id");
 
         const fetchToken = async () => {
             
@@ -117,7 +116,7 @@ export default function Dashboard() {
     }
 
     function logoutUser() {
-        localStorage.removeItem('spotify_id');
+        localStorage.removeItem('user_id');
         router.push("/");
         return;
     }

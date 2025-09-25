@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { PieChart } from '@mui/x-charts/PieChart';
 import { SpotifyPlaylistItem } from '../../../defines';
 import Box from '@mui/material/Box';
@@ -28,7 +28,7 @@ export default function AnalyzePage() {
     const playlist_id = params.id as string;
 
     useEffect(() => {
-        const user_id = localStorage.getItem('spotify_id');
+        const user_id = localStorage.getItem('user_id');
 
         if (!user_id) {
             router.push('/');

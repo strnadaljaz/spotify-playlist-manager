@@ -1,8 +1,7 @@
 'use client';
 
-import { useEffect, useState, useCallback} from "react";
+import { useEffect, useCallback} from "react";
 import { useRouter, useParams } from "next/navigation";
-import { SpotifyPlaylist, Tracks, SpotifyTrack } from "../../defines";
 import Image from "next/image";
 import Loader from "@/app/components/Loader";
 import { useSpotify } from "@/app/hooks/useSpotify";
@@ -25,7 +24,7 @@ export default function PlaylistDetail() {
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            const spotify_id = localStorage.getItem('spotify_id');
+            const spotify_id = localStorage.getItem('user_id');
             setUserId(spotify_id);
 
             if (!spotify_id) {

@@ -40,7 +40,7 @@ function CallbackContent() {
                 const data = await response.json();
 
                 // Save spotify id to local storage
-                localStorage.setItem("spotify_id", data.spotify_id);
+                localStorage.setItem("user_id", data.spotify_id);
 
                 if (data.error) {
                     setStatus('Error: ' + data.error);
