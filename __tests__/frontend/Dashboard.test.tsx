@@ -5,6 +5,10 @@ import Dashboard from "../../app/dashboard/page";
 import { useSpotify } from "../../app/hooks/useSpotify";
 import "whatwg-fetch";
 
+const backendUrl =
+  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  "https://spotify-playlist-manager-backend-atej.onrender.com";
+
 jest.mock("../../app/hooks/useSpotify");
 const mockPush = jest.fn();
 jest.mock("next/navigation", () => ({
@@ -79,5 +83,82 @@ describe("Dashboard", () => {
       expect(mockPush).toHaveBeenCalledWith("/");
     });
     expect(localStorage.getItem("spotify_access_token")).toBeNull();
+  });
+
+  test("On mount, fetches access token and playlists from backend using spotify_id", async () => {
+    (useSpotify as jest.Mock).mockImplementation(() => ({
+      playlistsData: null,
+      setPlaylistsData: jest.fn(),
+      userInfo: null,
+      setUserInfo: jest.fn(),
+      token: null,
+      setToken: jest.fn(),
+    }));
+    
+    localStorage.setItem("user_id", "test_id");
+
+    const fetchMock = jest.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: true,
+      json: async () => ({}),
+    } as Response);
+
+    render(<Dashboard/>);
+
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith(
+        `${backendUrl}/getAccessToken`,
+        expect.objectContaining({
+          method: "POST",
+          headers: expect.objectContaining({
+            "Content-Type": "application/json",
+          }),
+          body: expect.any(String),
+        })
+      );
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        `${backendUrl}/getPlaylistsData`,
+        expect.objectContaining({
+          method: "POST",
+          headers: expect.objectContaining({
+            "Content-Type": "application/json",
+          }),
+          body: expect.any(String),
+        })
+      );
+    });
+    fetchMock.mockRestore();
+  });
+
+  test("Fetches Spotify user info using the access token", async () => {
+    const fakeToken = "test_token";
+
+    (useSpotify as jest.Mock).mockImplementation(() => ({
+      playlistsData: [],
+      setPlaylistsData: jest.fn(),
+      userInfo: null,
+      setUserInfo: jest.fn(),
+      token: fakeToken,
+      setToken: jest.fn(),
+    }));
+
+    const fetchMock = jest.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: true,
+      json: async () => ({}),
+    } as Response);
+
+    render(<Dashboard />);
+
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith(
+        "https://api.spotify.com/v1/me",
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            "Authorization": `Bearer ${fakeToken}`
+          }),
+        })
+      );
+    });
+    fetchMock.mockRestore();
   });
 });
