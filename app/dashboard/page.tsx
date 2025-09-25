@@ -4,8 +4,8 @@ import React from "react";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import Loader from "@/app/components/Loader";
-import { useSpotify } from "@/app/hooks/useSpotify";
+import Loader from "../components/Loader";
+import { useSpotify } from "../hooks/useSpotify";
 
 export default function Dashboard() {
     const {

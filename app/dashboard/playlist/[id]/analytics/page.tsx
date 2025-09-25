@@ -6,8 +6,8 @@ import { PieChart } from '@mui/x-charts/PieChart';
 import { SpotifyPlaylistItem } from '../../../defines';
 import Box from '@mui/material/Box';
 import { BarChart } from '@mui/x-charts/BarChart';
-import Loader from "@/app/components/Loader";
-import { useSpotify } from "@/app/hooks/useSpotify";
+import Loader from "../../../../components/Loader";
+import { useSpotify } from "../../../../hooks/useSpotify";
 
 export default function AnalyzePage() {
     const {

@@ -1,7 +1,7 @@
 'use client';
 
 import React from "react";
-import SpotifyLogo from "@/app/components/SpotifyLogo";
+import SpotifyLogo from "./components/SpotifyLogo";
 
 export default function Home() {
 
