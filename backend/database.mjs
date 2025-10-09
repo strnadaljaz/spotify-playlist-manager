@@ -1,8 +1,11 @@
 import dotenv from 'dotenv';
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, set, child, get } from "firebase/database";
-
+// For encryption and decryption
+import ncrypt from 'ncrypt-js';
 dotenv.config();
+let secretKey = process.env.SECRET_KEY;
+let ncryptObject = new ncrypt(secretKey);
 
 const firebaseConfig = {
     apiKey: process.env.FIREBASE_API_KEY,
@@ -16,6 +19,20 @@ const firebaseConfig = {
 };
 
 const firebaseApp = initializeApp(firebaseConfig);
+
+function encryptData(access_token, refresh_token, expires) {
+    let enc_access_token = ncryptObject.encrypt(access_token);
+    let enc_refresh_token = ncryptObject.encrypt(refresh_token);
+    let enc_expires = ncryptObject.encrypt(expires);
+
+    return { enc_access_token, enc_refresh_token, enc_expires };
+}
+
+function decryptData(access_token, refresh_token, expires) {
+    let dec_access_token = ncryptObject.decrypt(access_token);
+    let dec_refresh_token = ncryptObject.decrypt(refresh_token);
+    let dec_expires = ncryptObject.decrypt(expires);
+}
 
 export function writeData(spotify_id, access_token, refresh_token, expires) {
     const db = getDatabase();
