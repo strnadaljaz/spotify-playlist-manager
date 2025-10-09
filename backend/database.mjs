@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, set, child, get } from "firebase/database";
+import { access } from 'fs';
 // For encryption and decryption
 import ncrypt from 'ncrypt-js';
 dotenv.config();
@@ -21,25 +22,30 @@ const firebaseConfig = {
 const firebaseApp = initializeApp(firebaseConfig);
 
 function encryptData(access_token, refresh_token, expires) {
-    let enc_access_token = ncryptObject.encrypt(access_token);
-    let enc_refresh_token = ncryptObject.encrypt(refresh_token);
-    let enc_expires = ncryptObject.encrypt(expires);
+    const enc_access_token = ncryptObject.encrypt(access_token);
+    const enc_refresh_token = ncryptObject.encrypt(refresh_token);
+    const enc_expires = ncryptObject.encrypt(expires);
 
     return { enc_access_token, enc_refresh_token, enc_expires };
 }
 
 function decryptData(access_token, refresh_token, expires) {
-    let dec_access_token = ncryptObject.decrypt(access_token);
-    let dec_refresh_token = ncryptObject.decrypt(refresh_token);
-    let dec_expires = ncryptObject.decrypt(expires);
+    const dec_access_token = ncryptObject.decrypt(access_token);
+    const dec_refresh_token = ncryptObject.decrypt(refresh_token);
+    const dec_expires = ncryptObject.decrypt(expires);
+
+    return { dec_access_token, dec_refresh_token, dec_expires };
 }
 
 export function writeData(spotify_id, access_token, refresh_token, expires) {
     const db = getDatabase();
+
+    const { enc_access_token, enc_refresh_token, enc_expires } = encryptData(access_token, refresh_token, expires);
+
     set(ref(db, 'users/' + spotify_id), {
-        access_token: access_token,
-        refresh_token: refresh_token,
-        expires : expires
+        access_token: enc_access_token,
+        refresh_token: enc_refresh_token,
+        expires : enc_expires
     });
 }
 
@@ -48,7 +54,19 @@ export async function readData(user_id) {
     try {
         const snapshot = await get(child(dbRef, `users/${user_id}`));
         if (snapshot.exists()) {
-            return snapshot.val();
+            const encryptedData =  snapshot.val();
+
+            const { dec_access_token, dec_refresh_token, dec_expires } = decryptData(
+                encryptedData.access_token,
+                encryptedData.refresh_token,
+                encryptedData.expires
+            );
+
+            return {
+                access_token: dec_access_token,
+                refresh_token: dec_refresh_token,
+                expires: dec_expires
+            };
         } else {
             console.log("No data available");
             return null;
