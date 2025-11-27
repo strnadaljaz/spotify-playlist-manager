@@ -132,11 +132,11 @@ export default function Dashboard() {
             <div className="max-w-6xl mx-auto">
                 <div className="flex justify-between items-center">
                     <h1 className="text-white text-4xl font-bold mb-8">Dashboard</h1>
-                    <button className="text-white px-4 py-2 rounded-lg transition-colors duration-200 cursor-pointer mb-8" onClick={logoutUser}>Logout</button>
+                    <button className="text-white px-4 py-2 rounded-lg transition-transform duration-200 cursor-pointer mb-8 hover:scale-112" onClick={logoutUser}>Logout</button>
                 </div>
                 {userInfo && (
-                    <div className="bg-gray-800 p-6 rounded-lg mb-8">
-                        <h2 className="text-white text-xl mb-4">Welcome, {userInfo.display_name}</h2>
+                    <div className="bg-gradient-to-b from-green-800 to-green-900 p-6 rounded-lg mb-8">
+                        <h2 className="text-white text-xl mb-4">Welcome, <span className="font-bold underline underline-offset-2">{userInfo.display_name}</span></h2>
                         <p className="text-gray-300">You&apos;re successfully authenticated with Spotify.</p>
                     </div>
                 )}
@@ -148,7 +148,7 @@ export default function Dashboard() {
                         {playlistsData && playlistsData.map((playlist) => (
                             <div 
                                 key={playlist.id} 
-                                className="bg-gray-800 rounded-lg p-4 hover:bg-gray-700 transition-colors duration-200 cursor-pointer group"
+                                className="bg-gradient-to-b from-green-800 to-green-900 rounded-lg p-4 hover:bg-gray-700 transition-colors duration-200 cursor-pointer group"
                                 onClick={() => handlePlaylistClick(playlist.id)}
                             >
                                 <div className="aspect-square mb-4 overflow-hidden rounded-md">
@@ -164,11 +164,11 @@ export default function Dashboard() {
                                     <h3 className="text-white font-medium text-sm line-clamp-2 leading-tight">
                                         {playlist.name}
                                     </h3>
-                                    <p className="text-gray-400 text-xs">
+                                    <p className="text-gray-300 text-xs">
                                         {playlist.tracks?.total || 0} tracks
                                     </p>
                                     {playlist.description && (
-                                        <p className="text-gray-500 text-xs line-clamp-2 mt-1">
+                                        <p className="text-gray-400 text-xs line-clamp-2 mt-1">
                                             {playlist.description}
                                         </p>
                                     )}

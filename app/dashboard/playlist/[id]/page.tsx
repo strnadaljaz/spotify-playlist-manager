@@ -310,7 +310,7 @@ export default function PlaylistDetail() {
                                     <span className="text-gray-400 text-sm group-hover:hidden">
                                         {index + 1}
                                     </span>
-                                    <button className="hidden group-hover:block text-white hover:text-green-500 cursor-pointer" onClick={handlePlayClick}>
+                                    <button className="hidden group-hover:block text-white hover:text-green-500 cursor-pointer hover:scale-110 transition-transform" onClick={handlePlayClick}>
                                         ▶
                                     </button>
                                 </div>
