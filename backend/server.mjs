@@ -1,5 +1,3 @@
-// Napisi funkcijo za pridobivanje novega access tokena
-
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
@@ -16,7 +14,7 @@ app.use(cors({
 app.use(express.json());
 
 const clientID = process.env.CLIENT_ID;
-const clientSecret = process.env.CLIENT_SECRET;
+const clientSecret = praocess.env.CLIENT_SECRET;
 
 const redirectURI = process.env.REDIRECT_URI || 'http://127.0.0.1:3000/callback'; 
 const AuthLink = 'https://accounts.spotify.com/authorize?';
